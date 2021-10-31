@@ -1,4 +1,4 @@
-use borsh::{BorshDeserialize, BorshSerialize};
+use borsh::{BorshSerialize, BorshDeserialize};
 
 #[derive(BorshDeserialize, BorshSerialize, Debug)]
 pub struct Mail {
@@ -14,4 +14,9 @@ pub struct Mail {
 pub struct MailAccount {
     pub inbox: Vec<Mail>,
     pub sent: Vec<Mail>,
+}
+
+#[derive(BorshDeserialize, BorshSerialize, Debug)]
+pub struct DataLength {
+    pub length: u32,
 }

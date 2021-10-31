@@ -1,11 +1,16 @@
 use crate::error::MailError::NotWritable;
 use crate::instruction::MailInstruction;
-use crate::state::{Mail, MailAccount};
+use crate::state::{Mail, MailAccount, DataLength};
 use borsh::{BorshSerialize, BorshDeserialize};
 use solana_program::{
-    account_info::AccountInfo, entrypoint::ProgramResult, msg, program_error::ProgramError,
+    account_info::AccountInfo, 
+    entrypoint::ProgramResult, 
+    msg, 
+    program_error::ProgramError,
     pubkey::Pubkey,
+    borsh::get_instance_packed_len
 };
+use std::convert::TryFrom;
 
 pub struct Processor;
 
@@ -52,7 +57,13 @@ impl Processor {
             sent: Vec::new(),
         };
 
-        mail_accout.serialize(&mut &mut accout.data.borrow_mut()[..])?;
+        let data_length = DataLength {
+            length: u32::try_from(get_instance_packed_len(&mail_account)?).unwrap(),
+        };
+
+        let offset: usize = 4;
+        data_length.serialize(&mut &mut accout.data.borrow_mut()[..offset])?;
+        mail_accout.serialize(&mut &mut accout.data.borrow_mut()[offset..])?;
 
         Ok(())
     }
@@ -78,13 +89,48 @@ impl Processor {
             return Err(ProgramError::IncorrectProgramId);
         }
 
-        let sender_data = MailAccount::try_from_slice(&sender_account.data.borrow()[..]);
-        sender_data.sent.push(mail.clone());
-        sender_data.serialize(&mut &mut sender_account.data.borrow_mut()[..])?;
+        let offset: usize = 4;
 
-        receiver_data = MailAccount::try_from_slice(&receiver_account.data.borrow()[..])?;
+        let data_length = DataLength::try_from_slice(&sender_account.data.borrow()[..offset])?;
+
+        let mut sender_data;
+        if data_length.length > 0 {
+            let length = usize::try_from(data_length + u32::try_from(offset).unwrap()).unwrap();
+            sender_data = MailAccount::try_from_slice(&sender_account.data.borrow()[offset])?;
+        } else {
+            sender_data = MailAccount {
+                inbox: Vec::new(), 
+                sent: Vec::new()
+            };
+        }
+
+        sender_data.sent.push(mail.clone());
+        let data_length = DataLength {
+            length: u32::try_from(get_instance_packed_len(&sender_data)?).unwrap(), 
+        };
+        data_length.serialize(&mut &mut sender_account.data.borrow_mut()[..offset])?;
+        sender_data.serialize(&mut &mut sender_account.data.borrow_mut()[offset..])?;
+
+        let data_length = DataLength::try_from_slice(&receiver_account.data.borrow()[..offset])?;
+
+        let mut receiver_data;
+        if data_length.length > 0 {
+            let length = usize::try_from(data_length.length + u32::try_from(offset).unwrap()).unwrap();
+            receiver_data = MailAccount::try_from_slice(&receiver_account.data.borrow()[offset..length])?;
+        } else {
+            receiver_data = MailAccount {
+                inbox: Vec::new(), 
+                sent: Vec::new(),
+            }
+        }
         receiver_data.inbox.push(mail.clone());
-        receiver_data.serialize(&mut &mut receiver_account.data.borrow_mut()[..])?;
+
+        let data_length = DataLength {
+            length: u32::try_from(get_instance_packed_len(&receiver_data)?).unwrap(),
+        };
+
+        data_length.serialize(&mut &mut receiver_account.data.borrow_mut()[..offset])?;
+        receiver_data.serialize(&mut &mut receiver_account.data.borrow_mut()[offset..])?;
 
         Ok(())
     }
