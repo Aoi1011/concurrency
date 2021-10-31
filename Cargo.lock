@@ -4760,6 +4760,8 @@ name = "solana_mail"
 version = "0.1.0"
 dependencies = [
  "assert_matches",
+ "borsh",
+ "borsh-derive",
  "solana-program",
  "solana-program-test",
  "solana-sdk",
