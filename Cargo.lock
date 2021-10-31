@@ -4766,6 +4766,7 @@ dependencies = [
  "solana-program-test",
  "solana-sdk",
  "solana-validator",
+ "thiserror",
 ]
 
 [[package]]
