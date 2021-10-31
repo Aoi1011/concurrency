@@ -1,7 +1,7 @@
 use crate::error::MailError::NotWritable;
 use crate::instruction::MailInstruction;
 use crate::state::{Mail, MailAccount};
-use borsh::BorshSerialize;
+use borsh::{BorshSerialize, BorshDeserialize};
 use solana_program::{
     account_info::AccountInfo, entrypoint::ProgramResult, msg, program_error::ProgramError,
     pubkey::Pubkey,
@@ -21,6 +21,10 @@ impl Processor {
             MailInstruction::InitAccount => {
                 msg!("Instruction: InitAccount");
                 Self::process_init_account(accounts, program_id)
+            }, 
+            MailInstruction::SendMail {mail} => {
+                msg!("Instruction SendMail");
+                Self::process_send_mail(accounts, mail, program_id)
             }
         }
     }
@@ -49,6 +53,38 @@ impl Processor {
         };
 
         mail_accout.serialize(&mut &mut accout.data.borrow_mut()[..])?;
+
+        Ok(())
+    }
+
+    fn process_send_mail(accounts: &[AccountInfo], mail: &Mail, program_id: &Pubkey) -> ProgramResult {
+        let sender_account = &accounts[0];
+
+        if !sender_account.is_writable {
+            return Err(NotWritable.into());
+        }
+
+        if sender_account.owner != program_id {
+            return Err(ProgramError::IncorrectProgramId);
+        }
+
+        let receiver_account = &accounts[1];
+
+        if !receiver_account.is_writable {
+            return Err(NotWritable.into());
+        }
+
+        if receiver_account.owner != program_id {
+            return Err(ProgramError::IncorrectProgramId);
+        }
+
+        let sender_data = MailAccount::try_from_slice(&sender_account.data.borrow()[..]);
+        sender_data.sent.push(mail.clone());
+        sender_data.serialize(&mut &mut sender_account.data.borrow_mut()[..])?;
+
+        receiver_data = MailAccount::try_from_slice(&receiver_account.data.borrow()[..])?;
+        receiver_data.inbox.push(mail.clone());
+        receiver_data.serialize(&mut &mut receiver_account.data.borrow_mut()[..])?;
 
         Ok(())
     }
