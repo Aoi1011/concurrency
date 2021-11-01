@@ -1,9 +1,10 @@
 use crate::error::MailError::InvalidInstruction;
 use crate::state::Mail;
+use borsh::BorshDeserialize;
 use solana_program::program_error::ProgramError;
 
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum MailInstruction {
     /// initialize a new account
     /// Accouts expected 
