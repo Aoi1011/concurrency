@@ -1,8 +1,14 @@
 use crate::error::MailError::InvalidInstruction;
+use crate::state::Mail;
 use solana_program::program_error::ProgramError;
+
 
 #[derive(Debug)]
 pub enum MailInstruction {
+    /// initialize a new account
+    /// Accouts expected 
+    /// 
+    /// 1. `[writable]` The AccountInfo of the account to be initialized
     InitAccount,
     SendMail { mail: Mail },
 }

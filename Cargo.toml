@@ -7,6 +7,9 @@ publish = false
 
 [dependencies]
 solana-program = "=1.8.2"
+borsh = "0.9.1"
+borsh-derive = "0.9.1"
+thiserror = "1.0.24"
 
 [features]
 test-bpf = []
@@ -16,9 +19,7 @@ assert_matches = "1.4.0"
 solana-program-test = "=1.8.2"
 solana-sdk = "=1.8.2"
 solana-validator = "=1.8.2"
-borsh = "0.9.1"
-borsh-derive = "0.9.1"
-thiserror = "1.0.24"
+
 
 [lib]
 crate-type = ["cdylib", "lib"]
