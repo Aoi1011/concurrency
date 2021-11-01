@@ -52,7 +52,7 @@ impl Processor {
             sent_date: String::from("9/29/2021, 3:58:02 PM"),
         };
 
-        let mail_accout = MailAccount {
+        let mail_account = MailAccount {
             inbox: vec![welcome_mail], 
             sent: Vec::new(),
         };
@@ -63,7 +63,7 @@ impl Processor {
 
         let offset: usize = 4;
         data_length.serialize(&mut &mut accout.data.borrow_mut()[..offset])?;
-        mail_accout.serialize(&mut &mut accout.data.borrow_mut()[offset..])?;
+        mail_account.serialize(&mut &mut accout.data.borrow_mut()[offset..])?;
 
         Ok(())
     }
