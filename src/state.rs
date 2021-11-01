@@ -1,6 +1,6 @@
 use borsh::{BorshSerialize, BorshDeserialize};
 
-#[derive(BorshDeserialize, BorshSerialize, Debug)]
+#[derive(BorshDeserialize, BorshSerialize, Debug, Clone)]
 pub struct Mail {
     pub id: String,
     pub from_address: String,

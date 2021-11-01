@@ -95,8 +95,8 @@ impl Processor {
 
         let mut sender_data;
         if data_length.length > 0 {
-            let length = usize::try_from(data_length + u32::try_from(offset).unwrap()).unwrap();
-            sender_data = MailAccount::try_from_slice(&sender_account.data.borrow()[offset])?;
+            let length = usize::try_from(data_length.length + u32::try_from(offset).unwrap()).unwrap();
+            sender_data = MailAccount::try_from_slice(&sender_account.data.borrow()[offset..length])?;
         } else {
             sender_data = MailAccount {
                 inbox: Vec::new(), 
