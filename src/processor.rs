@@ -25,11 +25,11 @@ impl Processor {
         match instruction {
             MailInstruction::InitAccount => {
                 msg!("Instruction: InitAccount");
-                Self::process_init_account(accounts, program_id)
+                Self::process_init_account(&accounts[0], program_id)
             }, 
             MailInstruction::SendMail {mail} => {
                 msg!("Instruction SendMail");
-                Self::process_send_mail(accounts, mail, program_id)
+                Self::process_send_mail(accounts, &mail, program_id)
             }
         }
     }
