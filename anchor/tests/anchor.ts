@@ -6,17 +6,18 @@ import anchor from "@project-serum/anchor";
 
 const { SystemProgram } = anchor.web3;
 
-describe("mysolanaapp", () => {
+describe("anchor", () => {
   // Configure the client to use the local cluster.
   const provider = anchor.Provider.env();
   anchor.setProvider(provider);
-  const program = anchor.workspace.Mysolanaapp as Program<Anchor>;
+  const program = anchor.workspace.Anchor as Program<Anchor>;
+
+  let _baseAccount;
 
   it("Creates a counter", async () => {
     // Call the create function via RPC
     const baseAccount = anchor.web3.Keypair.generate();
-    let _baseAccount;
-    
+
     await program.rpc.create({
       accounts: {
         baseAccount: baseAccount.publicKey,
@@ -27,9 +28,25 @@ describe("mysolanaapp", () => {
     });
 
     // Fetch the account and check the value of count
-    const account = await program.account.baseAccount.fetch(baseAccount.publicKey);
+    const account = await program.account.baseAccount.fetch(
+      baseAccount.publicKey
+    );
     console.log("Count 0: ", account.count.toString());
-    assert.ok(account.count.toString() === '0');
+    assert.ok(account.count.toString() === "0");
     _baseAccount = baseAccount;
+  });
+
+  it("Increments the counter", async () => {
+    const baseAccount = _baseAccount;
+
+    await program.rpc.increment({
+      accounts: {
+        baseAccount: baseAccount.publicKey,
+      },
+    });
+
+    const account = await program.account.baseAccount.fetch(baseAccount.publicKey);
+    console.log("Count 1: ", account.count.toString());
+    assert.ok(account.count.toString() === "1");
   });
 });
