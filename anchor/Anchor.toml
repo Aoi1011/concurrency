@@ -1,11 +1,11 @@
 [programs.localnet]
-anchor = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+anchor = "9dSqPMp8DSYas4mRhJcyhXDGrCdypZE5pcJ1MCnZH17x"
 
 [registry]
 url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "/Users/aoikurokawa/.config/solana/id.json"
 
 [scripts]
