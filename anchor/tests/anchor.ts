@@ -4,7 +4,7 @@ import { Anchor } from "../target/types/anchor";
 import assert from "assert";
 import anchor from "@project-serum/anchor";
 
-const { SystemProgram } = anchor.web3;
+const SystemProgram = anchor.web3.SystemProgram;
 
 describe("anchor", () => {
   // Configure the client to use the local cluster.
@@ -18,7 +18,7 @@ describe("anchor", () => {
     // Call the create function via RPC
     const baseAccount = anchor.web3.Keypair.generate();
 
-    await program.rpc.initialize({
+    await program.rpc.initialize("Hello World", {
       accounts: {
         baseAccount: baseAccount.publicKey,
         user: provider.wallet.publicKey,
@@ -31,22 +31,27 @@ describe("anchor", () => {
     const account = await program.account.baseAccount.fetch(
       baseAccount.publicKey
     );
-    console.log("Count 0: ", account.count.toString());
-    assert.ok(account.count.toString() === "0");
+    console.log("Data: ", account.data);
+    assert.ok(account.data === "Hello World");
     _baseAccount = baseAccount;
   });
 
-  it("Increments the counter", async () => {
+  it("Updates a previous created account", async () => {
     const baseAccount = _baseAccount;
 
-    await program.rpc.increment({
+    await program.rpc.update("Some new data", {
       accounts: {
         baseAccount: baseAccount.publicKey,
       },
     });
 
-    const account = await program.account.baseAccount.fetch(baseAccount.publicKey);
-    console.log("Count 1: ", account.count.toString());
-    assert.ok(account.count.toString() === "1");
+    const account = await program.account.baseAccount.fetch(
+      baseAccount.publicKey
+    );
+    console.log("Updated data: ", account.data);
+    assert.ok(account.data === "Some new data");
+    console.log("all account data: ", account);
+    console.log("All data: ", account.dataList);
+    assert.ok((account.dataList as any).length === 2);
   });
 });
