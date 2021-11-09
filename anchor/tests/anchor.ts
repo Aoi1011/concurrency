@@ -14,11 +14,11 @@ describe("anchor", () => {
 
   let _baseAccount;
 
-  it("Creates a counter", async () => {
+  it("It initialize the account", async () => {
     // Call the create function via RPC
     const baseAccount = anchor.web3.Keypair.generate();
 
-    await program.rpc.create({
+    await program.rpc.initialize({
       accounts: {
         baseAccount: baseAccount.publicKey,
         user: provider.wallet.publicKey,

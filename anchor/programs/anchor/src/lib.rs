@@ -7,7 +7,7 @@ pub mod anchor {
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>, data: String) -> ProgramResult {
-        let base_account = &mut ctx.accounts_base_account;
+        let base_account = &mut ctx.accounts.base_account;
         let copy = data.clone();
         base_account.data = data;
         base_account.data_list.push(copy);
