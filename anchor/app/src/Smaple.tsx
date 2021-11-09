@@ -16,7 +16,7 @@ import {
   WalletModalProvider,
   WalletMultiButton,
 } from "@solana/wallet-adapter-react-ui";
-require("@solana/wallet-adapter-react-ui/styles.css");
+require("@solana/wallet-adapter-react-ui/style.css");
 
 const wallets = [getPhantomWallet()];
 
