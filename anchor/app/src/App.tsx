@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./App.css";
 import { Commitment, Connection, PublicKey } from "@solana/web3.js";
-import { Program, Provider, Wallet, web3 } from "@project-serum/anchor";
+import { Program, Provider, web3 } from "@project-serum/anchor";
 import idl from "./idl.json";
 
 import { getPhantomWallet } from "@solana/wallet-adapter-wallets";
@@ -10,7 +10,6 @@ import {
   WalletProvider,
   ConnectionProvider,
 } from "@solana/wallet-adapter-react";
-
 import {
   WalletModalProvider,
   WalletMultiButton,
@@ -20,7 +19,6 @@ require("@solana/wallet-adapter-react-ui/styles.css");
 const wallets = [getPhantomWallet()];
 
 const { SystemProgram, Keypair } = web3;
-
 const baseAccount = Keypair.generate();
 const opts = {
   preflightCommitment: "processed",
@@ -121,6 +119,6 @@ const AppWithProvider = () => (
       </WalletModalProvider>
     </WalletProvider>
   </ConnectionProvider>
-)
+);
 
 export default AppWithProvider;
