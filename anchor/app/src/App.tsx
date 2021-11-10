@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import logo from "./logo.svg";
 import "./App.css";
 import { Commitment, Connection, PublicKey } from "@solana/web3.js";
 import { Program, Provider, Wallet, web3 } from "@project-serum/anchor";
