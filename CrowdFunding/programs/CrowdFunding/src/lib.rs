@@ -8,14 +8,16 @@ pub mod crowd_funding {
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>, _new_project: IProject) -> ProgramResult {
-        let exist_state = &mut ctx.accounts.state;
+        let state = &mut ctx.accounts.state;
         // let copy_project_ids = old_project_ids.project_ids.clone();
-        exist_state.projects.push(_new_project);
+        state.projects.push(_new_project);
         // old_project_ids.account.project_ids
         Ok(())
     }
 
-    pub fn createProject(ctx: Context<CreateProject>) -> ProgramResult {
+    pub fn create_project(ctx: Context<CreateProject>, _new_project: IProject) -> ProgramResult {
+        let state = &mut ctx.accounts.state;
+        state.projects.push(_new_project);
         Ok(())
     }
 }
@@ -52,6 +54,7 @@ pub struct State {
 #[account]
 pub struct IProject {
     project_id: u64,
+    representative: Pubkey,
     deadline: u16,
     achieved: bool,
 }
