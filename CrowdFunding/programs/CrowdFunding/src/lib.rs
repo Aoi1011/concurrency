@@ -8,7 +8,10 @@ pub mod crowd_funding {
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>, _new_project_id: u64) -> ProgramResult {
-        
+        let old_project_ids = &mut ctx.accounts.state;
+        // let copy_project_ids = old_project_ids.project_ids.clone();
+        old_project_ids.project_ids.push(_new_project_id);
+        // old_project_ids.account.project_ids
         Ok(())
     }
 
@@ -36,8 +39,8 @@ pub struct CreateProject<'info> {
 #[account]
 #[derive(Default)]
 pub struct State {
-    authority: Pubkey,
-    project_ids: Vec<u64>,
+    pub authority: Pubkey,
+    pub project_ids: Vec<u64>,
 }
 
 // #[account]
