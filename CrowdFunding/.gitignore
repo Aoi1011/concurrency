@@ -4,5 +4,3 @@
 target
 **/*.rs.bk
 node_modules
-
-/wallet-adapter
