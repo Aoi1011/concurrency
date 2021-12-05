@@ -46,14 +46,16 @@ pub mod crowd_funding {
             return Err(ProgramError::InsufficientFunds);
         }
 
-        **ctx.accounts.authority.try_borrow_mut_lamports()? -= amount;
+        // **ctx.accounts.authority.try_borrow_mut_lamports()? -= amount;
+        // **ctx.try_borrow_mut_lamports()? += amount;
+        anchor_lang::solana_program::system_instruction::transfer(
+            ctx.accounts.authority.key,
+            ctx.program_id,
+            amount,
+        );
         if let Some(x) = all_projects.get_mut(&project_id) {
             x.current_amount += amount
         }
-
-        // *current_amount += amount;
-
-        ctx.accounts.authority.lamports.borrow();
 
         Ok(())
     }
@@ -68,6 +70,8 @@ pub mod crowd_funding {
             msg!("The project is under");
             // return Err(ProgramError::);
         }
+
+        if all_projects[&project_id].goal_amount >= all_projects[&project_id].current_amount {}
 
         // if all_projects
         Ok(())
