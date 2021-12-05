@@ -140,3 +140,15 @@ impl Number {
         value.into()
     }
 }
+
+impl<T: Into<U192>> From<T> for Number {
+    fn from(n: T) -> Number {
+        Number(n.into() * ONE)
+    }
+}
+
+impl From<Number> for [u8; 24] {
+    fn from(n: Number) -> Self {
+        n.0.into()
+    }
+}
