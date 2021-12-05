@@ -34,6 +34,12 @@ pub mod crowd_funding {
         let all_projects = state.projects;
         let current_amount = all_projects[&project_id].current_amount;
 
+        let rent_exemption = Rent::get()?.minimum_balance(ctx.accounts.authority.data_len());
+        if **ctx.accounts.authority.lamports.borrow() - rent_exemption < amount {
+            msg!("Insufficient balance");
+            return Err(ProgramError::InsufficientFunds);
+        }
+
         **ctx.accounts.authority.try_borrow_mut_lamports()? -= amount;
         current_amount += amount;
 
