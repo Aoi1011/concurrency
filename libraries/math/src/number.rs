@@ -286,5 +286,21 @@ mod tests {
         assert_eq!(Number::ONE - Number::ONE, Number::ZERO);
     }
 
-    
+    #[test]
+    fn one_times_one_equals_one() {
+        assert_eq!(Number::ONE, Number::ONE * Number::ONE);
+    }
+
+    #[test]
+    fn one_devided_by_one_equals_one() {
+        assert_eq!(Number::ONE, Number::ONE / Number::ONE);
+    }
+
+    #[test]
+    fn ten_div_100_equals_point_1() {
+        assert_eq!(
+            Number::from_decimal(3, 1),
+            Number::from_decimal(1, 1) * 3u64
+        )
+    }
 }
