@@ -31,8 +31,14 @@ pub mod crowd_funding {
         amount: u64,
     ) -> ProgramResult {
         let state = &mut ctx.accounts.state;
-        let all_projects = state.projects;
-        let current_amount = all_projects[&project_id].current_amount;
+        let all_projects = &mut state.projects;
+
+        let now = Clock::get().unwrap().unix_timestamp;
+
+        if all_projects[&project_id].deadline > now {
+            msg!("The project is over!");
+            // return Err(ProgramError::);
+        }
 
         let rent_exemption = Rent::get()?.minimum_balance(ctx.accounts.authority.data_len());
         if **ctx.accounts.authority.lamports.borrow() - rent_exemption < amount {
@@ -41,16 +47,34 @@ pub mod crowd_funding {
         }
 
         **ctx.accounts.authority.try_borrow_mut_lamports()? -= amount;
-        current_amount += amount;
+        if let Some(x) = all_projects.get_mut(&project_id) {
+            x.current_amount += amount
+        }
+
+        // *current_amount += amount;
 
         ctx.accounts.authority.lamports.borrow();
 
         Ok(())
     }
 
+    pub fn achieve_project(ctx: Context<AchieveProject>, project_id: u64) -> ProgramResult {
+        let state = &mut ctx.accounts.state;
+        let all_projects = &state.projects;
+
+        let now = Clock::get().unwrap().unix_timestamp;
+
+        if all_projects[&project_id].deadline < now {
+            msg!("The project is under");
+            // return Err(ProgramError::);
+        }
+
+        // if all_projects
+        Ok(())
+    }
+
     pub fn delete_project(ctx: Context<CreateProject>, _new_project: IProject) -> ProgramResult {
         let state = &mut ctx.accounts.state;
-        state.projects.push(_new_project);
         Ok(())
     }
 }
@@ -78,6 +102,13 @@ pub struct SupportProject<'info> {
     pub authority: Signer<'info>,
 }
 
+#[derive(Accounts)]
+pub struct AchieveProject<'info> {
+    #[account(mut)]
+    pub state: Account<'info, State>,
+    pub authority: Signer<'info>,
+}
+
 #[account]
 #[derive(Default)]
 pub struct State {
@@ -98,6 +129,6 @@ pub struct IProject {
     representative: Pubkey,
     current_amount: u64,
     goal_amount: u64,
-    deadline: u16,
+    deadline: i64,
     achieved: bool,
 }
