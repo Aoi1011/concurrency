@@ -152,3 +152,73 @@ impl From<Number> for [u8; 24] {
         n.0.into()
     }
 }
+
+impl Display for Number {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        let rem = self.0 % ONE;
+        let decimal_digits = PRECISION as usize;
+        let rem_str = rem.to_string();
+
+        let decimals = "0".repeat(decimal_digits - rem_str.len()) + &*rem_str;
+        let striped_decimals = decimals.trim_end_matches('0');
+        let pretty_decimals = if striped_decimals.is_empty() {
+            "0"
+        } else {
+            striped_decimals
+        };
+
+        if self.0 < ONE {
+            write!(f, "0.{}", pretty_decimals)?;
+        } else {
+            let int = self.0 / ONE;
+            write!(f, "{}.{}", int, pretty_decimals)?;
+        }
+
+        Ok(())
+    }
+}
+
+#[derive(Error, Debug, Clone, Eq, PartialEq)]
+pub enum Error {
+    #[error("An integer value overflowed")]
+    Overflow(Number),
+
+    #[error("Attempting to divide by zero")]
+    DivideByZero,
+}
+
+impl Add<Number> for Number {
+    type Output = Number;
+
+    fn add(self, rhs: Number) -> Self::Output {
+        Self(self.0.add(rhs.0))
+    }
+}
+
+impl AddAssign<Number> for Number {
+    fn add_assign(&mut self, rhs: Number) {
+        self.0.add_assign(rhs.0)
+    }
+}
+
+impl SubAssign<Number> for Number {
+    fn sub_assign(&mut self, rhs: Number) {
+        self.0.sub_assign(rhs.0)
+    }
+}
+
+impl Sub<Number> for Number {
+    type Output = Number;
+
+    fn sub(self, rhs: Number) -> Self::Output {
+        Self(self.0.sub(rhs.0))
+    }
+}
+
+impl Mul<Number> for Number {
+    type Output = Number;
+
+    fn mul(self, rhs: Number) -> Self::Output {
+        Self(self.0.mul(rhs.0).div(ONE))
+    }
+}
