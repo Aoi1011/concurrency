@@ -299,8 +299,28 @@ mod tests {
     #[test]
     fn ten_div_100_equals_point_1() {
         assert_eq!(
+            Number::from_decimal(1, -1),
+            Number::from_decimal(1, 1) / Number::from_decimal(100, 0)
+        );
+    }
+
+    #[test]
+    fn multiply_by_u64() {
+        assert_eq!(
             Number::from_decimal(3, 1),
             Number::from_decimal(1, 1) * 3u64
-        )
+        );
+    }
+
+    #[test]
+    fn ceil_gt_one() {
+        assert_eq!(Number::from_decimal(11, -1).as_u64_ceil(0), 2u64);
+        assert_eq!(Number::from_decimal(19, -1).as_u64_ceil(0), 2u64);
+    }
+
+    #[test]
+    fn ceil_lt_one() {
+        assert_eq!(Number::from_decimal(1, -1).as_u64_ceil(0), 1u64);
+        assert_eq!(Number::from_decimal(1, -10).as_u64_ceil(0), 1u64);
     }
 }
