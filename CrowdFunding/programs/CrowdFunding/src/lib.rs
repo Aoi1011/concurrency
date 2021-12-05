@@ -35,7 +35,7 @@ pub mod crowd_funding {
 
         let now = Clock::get().unwrap().unix_timestamp;
 
-        if all_projects[&project_id].deadline > now {
+        if all_projects[&project_id].deadline < now {
             msg!("The project is over!");
             // return Err(ProgramError::);
         }
@@ -66,7 +66,7 @@ pub mod crowd_funding {
 
         let now = Clock::get().unwrap().unix_timestamp;
 
-        if all_projects[&project_id].deadline < now {
+        if all_projects[&project_id].deadline > now {
             msg!("The project is under");
             // return Err(ProgramError::);
         }
