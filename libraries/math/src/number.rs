@@ -1,0 +1,120 @@
+use std::{
+    iter::Sum,
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign},
+};
+
+use bytemuck::{Pod, Zeroable};
+use std::fmt::{Display, Formatter};
+use thiserror::Error;
+use uint::construct_uint;
+
+construct_uint! {
+    #[derive(Pod, Zeroable)]
+    pub struct U192(3);
+}
+
+pub const BPS_EXPONENT: i32 = -4;
+const PRECISION: i32 = 15;
+const ONE: U192 = U192([1_000_000_000_000_000, 0, 0]);
+const U64_MAX: U192 = U192([0xffffffffffffffff, 0x0, 0x0]);
+
+#[derive(Pod, Zeroable, Default, Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd)]
+#[repr(transparent)]
+pub struct Number(U192);
+
+static_assertions::const_assert_eq!(24, std::mem::size_of::<Number>());
+static_assertions::const_assert_eq!(0, std::mem::size_of::<Number>() % 8);
+impl Number {
+    pub const ONE: Number = Number(ONE);
+    pub const ZERO: Number = Number(U192::zero());
+
+    pub fn as_u64(&self, exponent: impl Into<i32>) -> u64 {
+        let extra_precision = PRECISION + exponent.into();
+        let mut prec_value = Self::ten_pow(extra_precision.abs() as u32);
+
+        if extra_precision < 0 {
+            prec_value = ONE / prec_value;
+        }
+
+        let target_value = self.0 / prec_value;
+        if target_value > U64_MAX {
+            panic!("cannot convert to u64 due to overflow");
+        }
+
+        target_value.as_u64()
+    }
+
+    pub fn as_u64_ceil(&self, exponent: impl Into<i32>) -> u64 {
+        let extra_precision = PRECISION + exponent.into();
+        let mut prec_value = Self::ten_pow(extra_precision.abs() as u32);
+
+        if extra_precision < 0 {
+            prec_value = ONE / prec_value;
+        }
+
+        let target_value = (prec_value - U192::from(1) + self.0) / prec_value;
+
+        if target_value > U64_MAX {
+            panic!("cannot convert to u64 due to overflow");
+        }
+
+        target_value.as_u64()
+    }
+
+    pub fn as_u64_rounded(&self, exponent: impl Into<i32>) -> u64 {
+        let extra_precision = PRECISION + exponent.into();
+        let mut prec_value = Self::ten_pow(extra_precision.abs() as u32);
+
+        if extra_precision < 0 {
+            prec_value = ONE / prec_value;
+        }
+
+        let rounding = match extra_precision > 0 {
+            true => U192::from(1) * prec_value / 2,
+            false => U192::zero(),
+        };
+
+        let target_value = (rounding + self.0) / prec_value;
+        if target_value > U64_MAX {
+            panic!("cannot convert to u64 due to overflow");
+        }
+
+        target_value.as_u64()
+    }
+
+    pub fn from_decimal(value: impl Into<U192>, exponent: impl Into<i32>) -> Self {
+        let extra_precision = PRECISION + exponent.into();
+        let mut prec_value = Self::ten_pow(extra_precision.abs() as u32);
+
+        if extra_precision < 0 {
+            prec_value = ONE / prec_value;
+        }
+
+        Self(value.into() * prec_value)
+    }
+
+    pub fn ten_pow(exponent: u32) -> U192 {
+        let value: u64 = match exponent {
+            16 => 10_000_000_000_000_000,
+            15 => 1_000_000_000_000_000,
+            14 => 100_000_000_000_000,
+            13 => 10_000_000_000_000,
+            12 => 1_000_000_000_000,
+            11 => 100_000_000_000,
+            10 => 10_000_000_000,
+            9 => 1_000_000_000,
+            8 => 100_000_000,
+            7 => 10_000_000,
+            6 => 1_000_000,
+            5 => 100_000,
+            4 => 10_000,
+            3 => 1_000,
+            2 => 100,
+            1 => 10,
+            0 => 1,
+            _ => panic!("no support for exponent: {}", exponent),
+        };
+
+        value.into()
+    }
+}
