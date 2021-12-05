@@ -269,4 +269,22 @@ mod tests {
         assert_eq!(Number::ZERO, Number::from_decimal(0, 0));
         assert_eq!(Number::ZERO, Number::from(0u64));
     }
+
+    #[test]
+    fn one_equals_one() {
+        assert_eq!(Number::ONE, Number::from_decimal(1, 0));
+        assert_eq!(Number::ONE, Number::from(1u64));
+    }
+
+    #[test]
+    fn one_plus_one_equals_two() {
+        assert_eq!(Number::from_decimal(2, 0), Number::ONE + Number::ONE);
+    }
+
+    #[test]
+    fn one_minus_one_equals_zero() {
+        assert_eq!(Number::ONE - Number::ONE, Number::ZERO);
+    }
+
+    
 }
