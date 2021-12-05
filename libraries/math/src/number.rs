@@ -222,3 +222,40 @@ impl Mul<Number> for Number {
         Self(self.0.mul(rhs.0).div(ONE))
     }
 }
+
+impl MulAssign<Number> for Number {
+    fn mul_assign(&mut self, rhs: Number) {
+        self.0.mul_assign(rhs.0);
+        self.0.div_assign(ONE)
+    }
+}
+
+impl Div<Number> for Number {
+    type Output = Number;
+
+    fn div(self, rhs: Number) -> Self::Output {
+        Self(self.0.mul(ONE).div(rhs.0))
+    }
+}
+
+impl<T: Into<U192>> Mul<T> for Number {
+    type Output = Number;
+
+    fn mul(self, rhs: T) -> Self::Output {
+        Self(self.0.mul(rhs.into()))
+    }
+}
+
+impl<T: Into<U192>> Div<T> for Number {
+    type Output = Number;
+
+    fn div(self, rhs: T) -> Self::Output {
+        Self(self.0.div(rhs.into()))
+    }
+}
+
+impl Sum for Number {
+    fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
+        iter.reduce(|a, b| a + b).unwrap_or(Self::ZERO)
+    }
+}
