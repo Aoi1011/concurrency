@@ -323,4 +323,20 @@ mod tests {
         assert_eq!(Number::from_decimal(1, -1).as_u64_ceil(0), 1u64);
         assert_eq!(Number::from_decimal(1, -10).as_u64_ceil(0), 1u64);
     }
+
+    #[test]
+    fn ceil_of_int() {
+        assert_eq!(Number::from_decimal(1, 0).as_u64_ceil(0), 1u64);
+        assert_eq!(
+            Number::from_decimal(1_000_000u64, 0).as_u64_ceil(0),
+            1_000_000u64
+        );
+    }
+
+    #[test]
+    fn to_string() {
+        assert_eq!("1000.0", Number::from(1000).to_string());
+        assert_eq!("1.0", Number::from(1).to_string());
+        assert_eq!("0.001", Number::from_decimal(1, -3).to_string());
+    }
 }
