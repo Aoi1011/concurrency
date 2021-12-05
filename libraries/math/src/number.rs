@@ -259,3 +259,14 @@ impl Sum for Number {
         iter.reduce(|a, b| a + b).unwrap_or(Self::ZERO)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn zero_equals_zero() {
+        assert_eq!(Number::ZERO, Number::from_decimal(0, 0));
+        assert_eq!(Number::ZERO, Number::from(0u64));
+    }
+}
