@@ -1,8 +1,9 @@
 use anchor_lang::error;
+// use solana_program::program_error::ProgramError;
 
 #[error]
 pub enum ErrorCode {
-    #[error("CrowdFunding is over")]
+    #[msg("CrowdFunding is over")]
     CrowdFundingOver,
 }
 

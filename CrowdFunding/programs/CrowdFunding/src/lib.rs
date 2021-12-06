@@ -43,7 +43,7 @@ pub mod crowd_funding {
 
         if all_projects[&project_id].deadline < now {
             msg!("The project is over!");
-            // return Err(ProgramError::);
+            return Err(ErrorCode::CrowdFundingOver.into());
         }
 
         let rent_exemption = Rent::get()?.minimum_balance(ctx.accounts.authority.data_len());
