@@ -6,8 +6,8 @@ pub enum ErrorCode {
     CrowdFundingOver,
 }
 
-impl From<CrowdFundingError> for ErrorCode {
-    fn from(e: CrowdFundingError) -> Self {
-        ProgramError::Custom(e as u32)
+impl From<math::Error> for ErrorCode {
+    fn from(_: math::Error) -> ErrorCode {
+        ErrorCode::CrowdFundingOver
     }
 }
