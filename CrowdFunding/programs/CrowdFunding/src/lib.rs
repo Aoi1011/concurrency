@@ -1,6 +1,12 @@
 use anchor_lang::prelude::*;
 use std::collections::HashMap;
 
+extern crate static_assertions;
+
+pub mod errors;
+
+use errors::ErrorCode;
+
 declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
 #[program]

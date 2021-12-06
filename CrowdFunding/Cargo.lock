@@ -9,6 +9,7 @@ dependencies = [
  "anchor-lang",
  "math",
  "solana-program",
+ "static_assertions",
  "thiserror",
 ]
 
