@@ -1,12 +1,13 @@
 [package]
 name = "CrowdFunding"
 version = "0.1.0"
-description = "Created with Anchor"
+description = "Crowdfunding Program"
 edition = "2018"
 
 [lib]
 crate-type = ["cdylib", "lib"]
 name = "crowd_funding"
+doctest = false
 
 [features]
 no-entrypoint = []
