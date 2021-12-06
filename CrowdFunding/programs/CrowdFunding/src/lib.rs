@@ -52,8 +52,6 @@ pub mod crowd_funding {
             return Err(ProgramError::InsufficientFunds);
         }
 
-        // **ctx.accounts.authority.try_borrow_mut_lamports()? -= amount;
-        // **ctx.try_borrow_mut_lamports()? += amount;
         anchor_lang::solana_program::system_instruction::transfer(
             ctx.accounts.authority.key,
             ctx.program_id,
