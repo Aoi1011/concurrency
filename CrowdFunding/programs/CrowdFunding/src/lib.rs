@@ -3,6 +3,7 @@ use anchor_lang::prelude::*;
 
 extern crate static_assertions;
 
+pub mod context;
 pub mod errors;
 pub mod state;
 
