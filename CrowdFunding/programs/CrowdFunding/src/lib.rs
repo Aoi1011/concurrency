@@ -118,6 +118,11 @@ pub struct AchieveProject<'info> {
 }
 
 #[account]
+pub struct SoundFundingAdmin {
+    pub authority: Pubkey,
+}
+
+#[account]
 #[derive(Default)]
 pub struct State {
     pub authority: Pubkey,
