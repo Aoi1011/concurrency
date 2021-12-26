@@ -14,11 +14,10 @@ pub mod crowd_funding {
 
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>, _new_project: IProject) -> ProgramResult {
-        let state = &mut ctx.accounts.state;
-        // let copy_project_ids = old_project_ids.project_ids.clone();
-        state.projects.insert(0, _new_project);
-        // old_project_ids.account.project_ids
+    pub fn init_admin(ctx: Context<Initialize>, authority: Pubkey) -> ProgramResult {
+        msg!("InitAdmin");
+        let admin = &mut ctx.accounts.admin;
+        admin.authority = authority;
         Ok(())
     }
 
@@ -89,11 +88,11 @@ pub mod crowd_funding {
 
 #[derive(Accounts)]
 pub struct Initialize<'info> {
+    #[account(init, payer = authority, space = 8 + 32)]
+    pub admin: Account<'info, SoundFundingAdmin>,
+    pub system_program: Program<'info, System>,
     #[account(mut)]
     pub authority: Signer<'info>,
-    #[account(init, payer = authority)]
-    pub state: Account<'info, State>,
-    pub system_program: Program<'info, System>,
 }
 
 #[derive(Accounts)]
