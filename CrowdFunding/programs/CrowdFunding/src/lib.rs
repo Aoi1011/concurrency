@@ -23,8 +23,11 @@ pub mod crowd_funding {
         Ok(())
     }
 
-    pub fn create_project(ctx: Context<CreateProject>, _new_project: IProject) -> ProgramResult {
+    pub fn create_project(ctx: Context<CreateProject>, amount: u64) -> ProgramResult {
         let user = ctx.accounts.contract_singer.key();
+        let clock = Clock::get()?;
+        let now = clock.unix_timestamp;
+
         let project_history = &mut ctx.accounts.project_history;
         let current_project = &mut project_history.record_id;
         let next_project_id = *current_project + 1;

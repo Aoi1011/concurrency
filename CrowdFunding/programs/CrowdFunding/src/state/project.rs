@@ -34,6 +34,7 @@ impl ProjectHistory {
 
 #[derive(Default, AnchorSerialize, AnchorDeserialize, Copy, Clone)]
 pub struct ProjectRecord {
+    pub time_stamp: i64,
     pub record_id: u128,
     pub project_creater: Pubkey,
     pub current_amount: u64,
