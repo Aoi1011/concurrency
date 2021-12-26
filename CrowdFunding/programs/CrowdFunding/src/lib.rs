@@ -1,9 +1,10 @@
 use anchor_lang::prelude::*;
-use std::collections::HashMap;
+// use std::collections::HashMap;
 
 extern crate static_assertions;
 
 pub mod errors;
+pub mod state;
 
 // use errors::ErrorCode;
 
@@ -14,19 +15,19 @@ pub mod crowd_funding {
 
     use super::*;
 
-    pub fn init_admin(ctx: Context<Initialize>, authority: Pubkey) -> ProgramResult {
+    pub fn init_admin(_ctx: Context<Initialize>, _authority: Pubkey) -> ProgramResult {
         msg!("InitAdmin");
-        let admin = &mut ctx.accounts.admin;
-        admin.authority = authority;
+        let admin = &mut _ctx.accounts.admin;
+        admin.authority = _authority;
         Ok(())
     }
 
-    pub fn create_project(ctx: Context<CreateProject>, _new_project: IProject) -> ProgramResult {
-        let state = &mut ctx.accounts.state;
+    pub fn create_project(_ctx: Context<CreateProject>, _new_project: IProject) -> ProgramResult {
+        let state = &mut _ctx.accounts.state;
         let current_project = &mut state.number_of_project;
         let next_project_id = *current_project + 1;
 
-        state.projects.insert(next_project_id, _new_project);
+        state.projects.push(_new_project);
         Ok(())
     }
 
@@ -121,20 +122,20 @@ pub struct SoundFundingAdmin {
     pub authority: Pubkey,
 }
 
-#[account]
-#[derive(Default)]
-pub struct State {
-    pub authority: Pubkey,
-    pub number_of_project: u64,
-    pub projects: HashMap<u64, IProject>,
-}
+// #[account]
+// #[derive(Default)]
+// pub struct State {
+//     pub authority: Pubkey,
+//     pub number_of_project: u64,
+//     pub projects: Vec<IProject>,
+// }
 
-#[account]
-pub struct IProject {
-    project_id: u64,
-    representative: Pubkey,
-    current_amount: u64,
-    goal_amount: u64,
-    deadline: i64,
-    achieved: bool,
-}
+// #[account]
+// pub struct IProject {
+//     project_id: u64,
+//     representative: Pubkey,
+//     current_amount: u64,
+//     goal_amount: u64,
+//     deadline: i64,
+//     achieved: bool,
+// }
