@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-// use std::collections::HashMap;
+use context::*;
 
 extern crate static_assertions;
 
@@ -16,16 +16,17 @@ pub mod crowd_funding {
 
     use super::*;
 
-    pub fn init_admin(_ctx: Context<Initialize>, _authority: Pubkey) -> ProgramResult {
+    pub fn init_admin(ctx: Context<Initialize>, _authority: Pubkey) -> ProgramResult {
         msg!("InitAdmin");
-        let admin = &mut _ctx.accounts.admin;
+        let admin = &mut ctx.accounts.admin;
         admin.authority = _authority;
         Ok(())
     }
 
-    pub fn create_project(_ctx: Context<CreateProject>, _new_project: IProject) -> ProgramResult {
-        let state = &mut _ctx.accounts.state;
-        let current_project = &mut state.number_of_project;
+    pub fn create_project(ctx: Context<CreateProject>, _new_project: IProject) -> ProgramResult {
+        let user = ctx.accounts.contract_singer.key();
+        let project_history = &mut ctx.accounts.project_history;
+        let current_project = &mut project_history.record_id;
         let next_project_id = *current_project + 1;
 
         state.projects.push(_new_project);
@@ -88,55 +89,22 @@ pub mod crowd_funding {
     }
 }
 
-#[derive(Accounts)]
-pub struct Initialize<'info> {
-    #[account(init, payer = authority, space = 8 + 32)]
-    pub admin: Account<'info, SoundFundingAdmin>,
-    pub system_program: Program<'info, System>,
-    #[account(mut)]
-    pub authority: Signer<'info>,
-}
 
-#[derive(Accounts)]
-pub struct CreateProject<'info> {
-    #[account(mut)]
-    pub state: Account<'info, State>,
-    pub authority: Signer<'info>,
-}
 
-#[derive(Accounts)]
-pub struct SupportProject<'info> {
-    #[account(mut)]
-    pub state: Account<'info, State>,
-    pub authority: Signer<'info>,
-}
+        // #[account]
+        // #[derive(Default)]
+        // pub struct State {
+        //     pub authority: Pubkey,
+        //     pub number_of_project: u64,
+        //     pub projects: Vec<IProject>,
+        // }
 
-#[derive(Accounts)]
-pub struct AchieveProject<'info> {
-    #[account(mut)]
-    pub state: Account<'info, State>,
-    pub authority: Signer<'info>,
-}
-
-#[account]
-pub struct SoundFundingAdmin {
-    pub authority: Pubkey,
-}
-
-// #[account]
-// #[derive(Default)]
-// pub struct State {
-//     pub authority: Pubkey,
-//     pub number_of_project: u64,
-//     pub projects: Vec<IProject>,
-// }
-
-// #[account]
-// pub struct IProject {
-//     project_id: u64,
-//     representative: Pubkey,
-//     current_amount: u64,
-//     goal_amount: u64,
-//     deadline: i64,
-//     achieved: bool,
-// }
+        // #[account]
+        // pub struct IProject {
+        //     project_id: u64,
+        //     representative: Pubkey,
+        //     current_amount: u64,
+        //     goal_amount: u64,
+        //     deadline: i64,
+        //     achieved: bool,
+        // }

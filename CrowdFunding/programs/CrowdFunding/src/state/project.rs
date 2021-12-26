@@ -26,7 +26,7 @@ impl ProjectHistory {
     }
 
     pub fn next_record_id(&self) -> u128 {
-        let prev_record_id = if self.head == 0 {1023} else {self.head - 1};
+        let prev_record_id = if self.head == 0 { 1023 } else { self.head - 1 };
         let prev_record = &self.project_records[ProjectHistory::index_of(prev_record_id)];
         prev_record.record_id + 1
     }
@@ -35,7 +35,7 @@ impl ProjectHistory {
 #[derive(Default, AnchorSerialize, AnchorDeserialize, Copy, Clone)]
 pub struct ProjectRecord {
     pub record_id: u128,
-    pub representative: Pubkey,
+    pub project_creater: Pubkey,
     pub current_amount: u64,
     pub goal_amount: u64,
     pub deadline: i64,

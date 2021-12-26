@@ -15,7 +15,7 @@ pub struct Initialize<'info> {
 pub struct CreateProject<'info> {
     #[account(mut)]
     pub project_history: Account<'info, ProjectHistory>,
-    pub authority: Signer<'info>,
+    pub contract_singer: AccountInfo<'info>,
 }
 
 #[derive(Accounts)]
