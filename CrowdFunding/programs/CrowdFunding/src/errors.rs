@@ -1,12 +1,13 @@
 use anchor_lang::error;
-// use solana_program::program_error::ProgramError;
 
-// pub type 
+pub type CrowdfundingResult<T = ()> = std::result::Result<T, ErrorCode>;
 
 #[error]
 pub enum ErrorCode {
     #[msg("CrowdFunding is over")]
     CrowdFundingOver,
+    #[msg("Insufficient goal amount")]
+    InsufficientGoalAmount,
 }
 
 // impl From<math::Error> for ErrorCode {
