@@ -5,7 +5,7 @@ extern crate static_assertions;
 
 pub mod errors;
 
-use errors::ErrorCode;
+// use errors::ErrorCode;
 
 declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
@@ -43,7 +43,7 @@ pub mod crowd_funding {
 
         if all_projects[&project_id].deadline < now {
             msg!("The project is over!");
-            return Err(ErrorCode::CrowdFundingOver.into());
+            // return Err(ErrorCode::CrowdFundingOver.into());
         }
 
         let rent_exemption = Rent::get()?.minimum_balance(ctx.accounts.authority.data_len());
@@ -124,12 +124,6 @@ pub struct State {
     pub number_of_project: u64,
     pub projects: HashMap<u64, IProject>,
 }
-
-// #[account]
-// pub struct Project {
-//     pub authority: Pubkey,
-//     pub project_ids: Vec<u64>,
-// }
 
 #[account]
 pub struct IProject {
