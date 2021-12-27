@@ -1,5 +1,5 @@
 [package]
-name = "CrowdFunding"
+name = "crowd_funding"
 version = "0.1.0"
 description = "Crowdfunding Program"
 edition = "2018"
