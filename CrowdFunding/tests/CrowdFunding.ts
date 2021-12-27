@@ -36,6 +36,7 @@ describe("CrowdFunding", () => {
     let goalAmount = 1;
     let deadline = 1;
     const projectRecord = anchor.web3.Keypair.generate();
+ 
     const tx = await program.rpc.createProject({
       accounts: {
         projectHistory: projectRecord.publicKey,
