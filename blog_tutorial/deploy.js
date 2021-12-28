@@ -49,11 +49,12 @@ function readKeyfile(keypairfile) {
     spwan.sync("anchor", ["build"], { stdio: "inherit" });
     let prograAuthorityKeypair = new Keypair();
 
-    let signature = await connection.requestAirdrop(
+    let signature1 = await connection.requestAirdrop(
       prograAuthorityKeypair.publicKey,
-      LAMPORTS_PER_SOL * 5
+      LAMPORTS_PER_SOL * 3
     );
-    await connection.confirmTransaction(signature);
+    await connection.confirmTransaction(signature1);
+    
 
     console.log(`\n\n Created keypair.\n`);
     console.log(`\n\n Saving keypair. ${programAuthorityKeypairFile}\n`);
