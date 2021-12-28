@@ -20,7 +20,7 @@ const programAuthorityKeypairFile = path.resolve(
 
 const programKeyfileName = `target/deploy/${projectName}-keypair.json`
 const programKeypairFile = path.resolve(
-    `${__dirname}${SLASH}${programKeyfileName}`
+  `${__dirname}${SLASH}${programKeyfileName}`
 );
 
 const connection = new Connection("https://api.devnet.solana.com", "confirmed");
@@ -33,7 +33,7 @@ function readKeyfile(keypairfile) {
   return keypair
 }
 
-;(async () => {
+; (async () => {
   let method;
   let programAuthorityKeypair;
   let programId;
@@ -47,14 +47,14 @@ function readKeyfile(keypairfile) {
     // does not exist, create it
     // use this to deploy
     spwan.sync("anchor", ["build"], { stdio: "inherit" });
-    let prograAuthorityKeypair = new Keypair();
 
+    let prograAuthorityKeypair = new Keypair(process.env.PROGRAM_AUTHORITY_KEYPAIR);
+    // let prograAuthorityKeypair = process.env.PROGRAM_AUTHORITY_KEYPAIR;
     let signature1 = await connection.requestAirdrop(
       prograAuthorityKeypair.publicKey,
-      LAMPORTS_PER_SOL * 3
+      LAMPORTS_PER_SOL * 2
     );
     await connection.confirmTransaction(signature1);
-    
 
     console.log(`\n\n Created keypair.\n`);
     console.log(`\n\n Saving keypair. ${programAuthorityKeypairFile}\n`);
@@ -69,7 +69,7 @@ function readKeyfile(keypairfile) {
     // does exist, use it to upgrade
     programAuthorityKeypair = readKeyfile(programAuthorityKeypairFile)
 
-    console.log(`\n\n\  Upgrading program.\n`)
+    console.log(`\n\n  Upgrading program.\n`)
 
     method = [
       "upgrade",
@@ -79,12 +79,14 @@ function readKeyfile(keypairfile) {
     ]
   }
 
+  console.log({ method })
+
   spwan.sync(
     "anchor",
     [
       ...method,
       "--provider.cluster",
-      "Devnet",
+      "devnet",
       "--provider.wallet",
       `${programAuthorityKeypairFile}`,
     ],

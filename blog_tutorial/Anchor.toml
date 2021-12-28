@@ -1,11 +1,11 @@
 [programs.localnet]
-blog = "82JVKb1ABeDTNyhid48FLPaYZVscMhXy8rzFEVBjy544"
+blog = "HEJAcC7cBSr9g1Wt2yPJikJ8LqutFYx7ZxJcKizskcWx"
 
 [registry]
 url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "localnet"
+cluster = "devnet"
 wallet = "/Users/aoikurokawa/.config/solana/id.json"
 
 [scripts]

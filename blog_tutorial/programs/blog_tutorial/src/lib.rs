@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use std::str::from_utf8;
 
-declare_id!("82JVKb1ABeDTNyhid48FLPaYZVscMhXy8rzFEVBjy544");
+declare_id!("HEJAcC7cBSr9g1Wt2yPJikJ8LqutFYx7ZxJcKizskcWx");
 
 #[program]
 pub mod blog_tutorial {
