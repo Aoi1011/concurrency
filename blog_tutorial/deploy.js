@@ -2,7 +2,7 @@ import spwan from "cross-spawn";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import path from "path";
-import { Keypair, Connection, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { Keypair, Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import fs from "fs";
 
 const projectName = "blog_tutorial";
@@ -48,10 +48,10 @@ function readKeyfile(keypairfile) {
     // use this to deploy
     spwan.sync("anchor", ["build"], { stdio: "inherit" });
 
-    let prograAuthorityKeypair = new Keypair(process.env.PROGRAM_AUTHORITY_KEYPAIR);
+    let prograAuthorityKey = new PublicKey(process.env.PROGRAM_AUTHORITY_KEYPAIR);
     // let prograAuthorityKeypair = process.env.PROGRAM_AUTHORITY_KEYPAIR;
     let signature1 = await connection.requestAirdrop(
-      prograAuthorityKeypair.publicKey,
+      prograAuthorityKey,
       LAMPORTS_PER_SOL * 2
     );
     await connection.confirmTransaction(signature1);
