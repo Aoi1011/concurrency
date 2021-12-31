@@ -7,9 +7,6 @@ pub mod errors;
 #[program]
 pub mod todo {
     use super::*;
-    // pub fn initialize(ctx: Context<Initialize>) -> ProgramResult {
-    //     Ok(())
-    // }
     pub fn new_list(
         ctx: Context<NewList>,
         name: String,

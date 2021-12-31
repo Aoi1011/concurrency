@@ -51,7 +51,7 @@ function createUsers(numUsers) {
   return Promise.all(promisses);
 }
 
-function programForrUser(user) {
+function programForUser(user) {
   return new anchor.Program(
     mainProgram.idl,
     mainProgram.programId,
@@ -65,7 +65,7 @@ async function createList(owner, name, capacity = 16) {
     mainProgram.programId
   );
 
-  let program = programForrUser(owner);
+  let program = programForUser(owner);
   await program.rpc.newList(name, capacity, bump, {
     accounts: {
       list: listAccount,
