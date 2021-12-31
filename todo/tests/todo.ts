@@ -4,6 +4,12 @@ import { Program } from "@project-serum/anchor";
 import { expect } from "chai";
 // import { Todo } from "../target/types/todo";
 
+interface Owner {
+  key: anchor.web3.Keypair;
+  wallet: anchor.Wallet;
+  provider: anchor.Provider;
+}
+
 const { SystemProgram, LAMPORTS_PER_SOL } = anchor.web3;
 
 const provider = anchor.Provider.env();
@@ -19,14 +25,19 @@ function expectBalance(actual, expected, message, slack = 20000) {
   expect(actual, message).within(expected - slack, expected + slack);
 }
 
-async function createUser(airdropBalance) {
+async function createUser(airdropBalance?: number): Promise<Owner> {
   airdropBalance = airdropBalance ?? 2 * LAMPORTS_PER_SOL;
   let user = anchor.web3.Keypair.generate();
-  let sig = await provider.connection.requestAirdrop(
+  let sig1 = await provider.connection.requestAirdrop(
     user.publicKey,
     airdropBalance
   );
-  await provider.connection.confirmTransaction(sig);
+  // let sig2 = await provider.connection.requestAirdrop(
+  //   user.publicKey,
+  //   airdropBalance
+  // );
+  await provider.connection.confirmTransaction(sig1);
+  // await provider.connection.confirmTransaction(sig2);
 
   let wallet = new anchor.Wallet(user);
   let userProvider = new anchor.Provider(
@@ -59,7 +70,7 @@ function programForUser(user) {
   );
 }
 
-async function createList(owner, name, capacity = 16) {
+async function createList(owner: Owner, name, capacity = 16) {
   const [listAccount, bump] = await anchor.web3.PublicKey.findProgramAddress(
     ["todolist", owner.key.publicKey.toBytes(), name.slice(0, 32)],
     mainProgram.programId
@@ -86,7 +97,7 @@ describe("new list", () => {
 
   it("creates a list", async () => {
     // Add your test here.
-    const owner = await createUser(1);
+    const owner = await createUser();
     let list = await createList(owner, "A list");
 
     expect(list.data.listOwner.toString(), "List owner is set").equals(

@@ -23,9 +23,6 @@ pub mod todo {
     }
 }
 
-#[derive(Accounts)]
-pub struct Initialize {}
-
 #[account]
 pub struct TodoList {
     pub list_owner: Pubkey,
