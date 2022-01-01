@@ -56,3 +56,18 @@ pub struct NewList<'info> {
     pub user: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
+
+#[account]
+pub struct ListItem {
+    pub creattor: Pubkey,
+    pub creator_finshed: bool,
+    pub list_owner_finshed: bool,
+    pub name: String,
+}
+
+impl ListItem {
+    fn space(name: &str) -> usize {
+        // discriminator + creator public key + 2 bools + name string
+        8 + 32 + 1 + 1 + 4 + name.len()
+    }
+}
