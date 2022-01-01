@@ -32,12 +32,7 @@ async function createUser(airdropBalance?: number): Promise<Owner> {
     user.publicKey,
     airdropBalance
   );
-  // let sig2 = await provider.connection.requestAirdrop(
-  //   user.publicKey,
-  //   airdropBalance
-  // );
   await provider.connection.confirmTransaction(sig1);
-  // await provider.connection.confirmTransaction(sig2);
 
   let wallet = new anchor.Wallet(user);
   let userProvider = new anchor.Provider(
@@ -51,6 +46,14 @@ async function createUser(airdropBalance?: number): Promise<Owner> {
     wallet,
     provider: userProvider,
   };
+}
+
+async function requestAirdrop(owner: Owner) {
+  let signature = await provider.connection.requestAirdrop(
+    owner.key.publicKey,
+    2 * LAMPORTS_PER_SOL
+  );
+  await provider.connection.confirmTransaction(signature);
 }
 
 function createUsers(numUsers) {
@@ -99,6 +102,8 @@ describe("new list", () => {
     // Add your test here.
     const owner = await createUser();
     let list = await createList(owner, "A list");
+
+    // await requestAirdrop(owner);
 
     expect(list.data.listOwner.toString(), "List owner is set").equals(
       owner.key.publicKey.toString()

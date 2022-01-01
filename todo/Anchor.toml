@@ -5,7 +5,7 @@ todo = "6NnowxYkaDjz7sto1RnuWgHreXZh7pNhHmNLL355m88U"
 url = "https://anchor.projectserum.com"
 
 [provider]
-cluster = "devnet"
+cluster = "localnet"
 wallet = "/Users/aoikurokawa/.config/solana/id.json"
 
 [scripts]
