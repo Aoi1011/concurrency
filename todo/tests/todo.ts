@@ -94,9 +94,6 @@ async function createList(owner: Owner, name, capacity = 16) {
 
 describe("new list", () => {
   // Configure the client to use the local cluster.
-  // anchor.setProvider(anchor.Provider.env());
-
-  // const program = anchor.workspace.Todo as Program<Todo>;
 
   it("creates a list", async () => {
     // Add your test here.
