@@ -4,6 +4,8 @@ declare_id!("6NnowxYkaDjz7sto1RnuWgHreXZh7pNhHmNLL355m88U");
 
 pub mod errors;
 
+use errors::TodoListError;
+
 #[program]
 pub mod todo {
     use super::*;
@@ -70,4 +72,23 @@ impl ListItem {
         // discriminator + creator public key + 2 bools + name string
         8 + 32 + 1 + 1 + 4 + name.len()
     }
+}
+
+#[derive(Accounts)]
+#[instruction(list_name: String, item_name: String, bounty: u64)]
+pub struct Add<'info> {
+    #[account(
+        mut, 
+        has_one=list_owner @ TodoListError::WrongListOwner, 
+        seeds=[b"todolist", list_owner.to_account_info().key.as_ref(), 
+        name_seed(&list_name)], 
+        bump=list.bump
+    )]
+    pub list: Account<'info, TodoList>,
+    pub list_owner: AccountInfo<'info>,
+    // 8 byte discriminator,
+    #[account(init, payer=user, space=ListItem::space(&item_name))]
+    pub item: Account<'info, ListItem>,
+    pub user: Signer<'info>,
+    pub system_program: Program<'info, System>,
 }
