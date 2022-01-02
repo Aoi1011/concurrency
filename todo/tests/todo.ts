@@ -349,6 +349,51 @@ describe("Finish", () => {
       "Initialized account has bounty"
     ).equals(bounty);
 
-    const firstResult = await finishItem({});
+    const firstResult = await finishItem({
+      list,
+      item,
+      user: owner,
+      listOwner: owner,
+      expectAccountClosed: null,
+    });
+
+    expect(
+      firstResult.list.data.lines,
+      "Item still in list after first finish"
+    ).deep.equals([item.publicKey]);
+    expect(
+      firstResult.item.data.creatorFinshed,
+      "Creator finish is false after owner calls finish"
+    ).equals(false);
+    expect(
+      firstResult.item.data.listOwnerFinshed,
+      "Owner finish flag gets set after owner calls finish"
+    ).equals(true);
+    expect(
+      await getAccountBalance(firstResult.item.publicKey),
+      "Bounty remains on item after one finish call"
+    ).equals(bounty);
+
+    const finishResult = await finishItem({
+      list,
+      item,
+      user: adder,
+      listOwner: owner,
+      expectAccountClosed: true,
+    });
+
+    expect(
+      finishResult.list.data.lines,
+      "Item removed from list after both finish"
+    ).deep.equals([]);
+    expect(
+      await getAccountBalance(finishResult.item.publicKey),
+      "Bounty remains on item after onw finish call"
+    ).equals(0);
+    expectBalance(
+      await getAccountBalance(owner.key.publicKey),
+      ownerInitial + bounty,
+      "Bounty transferred to owner"
+    );
   });
 });
