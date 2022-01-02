@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-// use anchor_lang::AccountsClose;
+use anchor_lang::AccountsClose;
 
 declare_id!("6NnowxYkaDjz7sto1RnuWgHreXZh7pNhHmNLL355m88U");
 
@@ -60,6 +60,29 @@ pub mod todo {
                 ],
             )?;
         }
+
+        Ok(())
+    }
+
+    pub fn cancel(ctx: Context<Cancel>, _list_name: String) -> ProgramResult {
+        let list = &mut ctx.accounts.list;
+        let item = &mut ctx.accounts.item;
+        let item_creator = &mut ctx.accounts.item_creator;
+
+        let user = ctx.accounts.user.to_account_info().key;
+
+        if &list.list_owner != user && &item.creattor != user {
+            return Err(TodoListError::CancelPermissions.into());
+        }
+
+        if !list.lines.contains(item.to_account_info().key) {
+            return Err(TodoListError::ItemNotFound.into())
+        }
+
+        item.close(item_creator.to_account_info())?;
+
+        let item_key = ctx.accounts.item.to_account_info().key;
+        list.lines.retain(|key| key != item_key);
 
         Ok(())
     }
