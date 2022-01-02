@@ -132,3 +132,16 @@ pub struct Add<'info> {
     pub user: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
+
+#[derive(Accounts)]
+#[instruction(list_name: String)]
+pub struct Cancel<'info> {
+    #[account(mut, has_one=list_owner @ TodoListError::WrongListOwner, seeds=[b"todolist", list_owner.to_account_info().key.as_ref(), name_seed(&list_name)], bump=list.bump)]
+    pub list: Account<'info, TodoList>,
+    pub list_owner: AccountInfo<'info>,
+    #[account(mut)]
+    pub item: Account<'info, ListItem>,
+    #[account(mut, address=item.creattor @ TodoListError::WrongItemCreator)]
+    pub item_creator: AccountInfo<'info>,
+    pub user: Signer<'info>,
+}
