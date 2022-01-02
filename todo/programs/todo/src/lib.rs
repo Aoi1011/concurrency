@@ -86,7 +86,40 @@ pub mod todo {
 
         Ok(())
     }
-}
+
+    pub fn finish(ctx: Context<Finish>, _list_name: String) -> ProgramResult {
+        let item = &mut ctx.accounts.item;
+        let list = &mut ctx.accounts.list;
+        let user = ctx.accounts.user.to_account_info().key;
+
+        if !list.lines.contains(item.to_account_info().key) {
+            return Err(TodoListError::ItemNotFound.into());
+        }
+
+        let is_item_creator = &item.creattor == user;
+        let is_list_owner = &list.list_owner == user;
+
+        if !is_item_creator && !is_list_owner {
+            return Err(TodoListError::FinishPermissions.into());
+        }
+
+        if is_item_creator {
+            item.creator_finshed = true;
+        }
+
+        if is_list_owner {
+            item.list_owner_finshed = true;
+        }
+
+        if item.creator_finshed && item.list_owner_finshed {
+            let item_key = item.to_account_info().key;
+            list.lines.retain(|key| key != item_key);
+            item.close(ctx.accounts.list_owner.to_account_info())?;
+        }
+        
+        Ok(())
+    }
+ }
 
 #[account]
 pub struct TodoList {
