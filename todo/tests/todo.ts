@@ -115,7 +115,28 @@ async function addItem({ list, user, name, bounty }) {
   };
 }
 
-describe("new list", () => {
+async function cancelItem({ list, item, itemCreator, user }) {
+  let program = programForUser(user);
+  await program.rpc.cancel(list.data.name, {
+    accounts: {
+      list: list.publicKey,
+      listOwner: list.data.listOwner,
+      item: item.publicKey,
+      itemCreator: itemCreator.key.publicKey,
+      user: user.key.publicKey,
+    },
+  });
+
+  let listData = await program.account.todoList.fetch(list.publicKey);
+  return {
+    list: {
+      publicKey: list.publicKey,
+      data: listData,
+    },
+  };
+}
+
+describe("New list", () => {
   // Configure the client to use the local cluster.
 
   it("creates a list", async () => {
@@ -133,7 +154,7 @@ describe("new list", () => {
   });
 });
 
-describe("add", () => {
+describe("Add", () => {
   it("Anyone can add an item to a list", async () => {
     const [owner, adder] = await createUsers(2);
 
@@ -153,10 +174,9 @@ describe("add", () => {
       result.item.data.creattor.toString(),
       "Item marked with creator"
     ).equals(adder.key.publicKey.toString());
-    expect(
-      result.item.data.creatorFinshed,
-      "creator_finished is false"
-    ).equals(false);
+    expect(result.item.data.creatorFinshed, "creator_finished is false").equals(
+      false
+    );
     expect(
       result.item.data.listOwnerFinshed,
       "list_owner_finished is false"
@@ -225,5 +245,50 @@ describe("add", () => {
     expect(adderStartingBalance, "Adder balance is unchanged").equals(
       adderNewBalance
     );
+  });
+});
+
+describe("Cancel", () => {
+  it("List owner can cacel item", async () => {
+    const [owner, adder] = await createUsers(2);
+    const list = await createList(owner, "list");
+
+    const adderStartingBalance = await getAccountBalance(adder.key.publicKey);
+
+    const result = await addItem({
+      list,
+      user: adder,
+      bounty: LAMPORTS_PER_SOL,
+      name: "An item",
+    });
+
+    const adderBalanceAfterAdd = await getAccountBalance(adder.key.publicKey);
+
+    expect(result.list.data.lines, "Item is added to the list").deep.equals([
+      result.item.publicKey,
+    ]);
+    expect(adderBalanceAfterAdd, "Bounty is removed from adder").lt(
+      adderStartingBalance
+    );
+
+    const cancelResult = await cancelItem({
+      list,
+      item: result.item,
+      itemCreator: adder,
+      user: owner,
+    });
+
+    const adderBalanceAfterCancel = await getAccountBalance(
+      adder.key.publicKey
+    );
+    expectBalance(
+      adderBalanceAfterCancel,
+      adderBalanceAfterAdd + LAMPORTS_PER_SOL,
+      "Cancel returns bounty to adder"
+    );
+    expect(
+      cancelResult.list.data.lines,
+      "Cancel removes data from list"
+    ).deep.equals([]);
   });
 });
