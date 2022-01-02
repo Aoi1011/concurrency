@@ -1,4 +1,5 @@
 use anchor_lang::prelude::*;
+use anchor_lang::AccountsClose;
 
 declare_id!("6NnowxYkaDjz7sto1RnuWgHreXZh7pNhHmNLL355m88U");
 
@@ -8,7 +9,9 @@ use errors::TodoListError;
 
 #[program]
 pub mod todo {
+    use anchor_lang::solana_program::{program::invoke, system_instruction::transfer};
     use super::*;
+
     pub fn new_list(
         ctx: Context<NewList>,
         name: String,
@@ -21,6 +24,43 @@ pub mod todo {
         list.bump = account_bump;
         list.name = name;
         list.capacity = capacity;
+        Ok(())
+    }
+
+    pub fn add(ctx: Context<Add>, _list_name: String, item_name: String, bounty: u64) -> ProgramResult {
+        let user = &ctx.accounts.user;
+        let list = &mut ctx.accounts.list;
+        let item = &mut ctx.accounts.item;
+
+        // check that the list isn't already full
+        if list.lines.len() >= list.capacity as usize {
+            return Err(TodoListError::ListFull.into());
+        }
+
+        list.lines.push(*item.to_account_info().key);
+        item.name = item_name;
+        item.creattor = *user.to_account_info().key;
+
+        // Move the bounty to the account. We account for the rent amount
+        // that Anchor's init already transfered into the account
+        let account_lamports = **item.to_account_info().lamports.borrow();
+        let transfer_amount = bounty.checked_sub(account_lamports).ok_or(TodoListError::BountyTooSmall)?;
+
+        if transfer_amount > 0 {
+            invoke(
+                &transfer(
+                    user.to_account_info().key, 
+                    item.to_account_info().key, 
+                    transfer_amount
+                ),
+                &[
+                    user.to_account_info(),
+                    item.to_account_info(),
+                    ctx.accounts.system_program.to_account_info()
+                ],
+            )?;
+        }
+
         Ok(())
     }
 }
