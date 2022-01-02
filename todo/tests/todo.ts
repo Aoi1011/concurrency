@@ -136,6 +136,42 @@ async function cancelItem({ list, item, itemCreator, user }) {
   };
 }
 
+async function finishItem({
+  list,
+  listOwner,
+  item,
+  user,
+  expectAccountClosed,
+}) {
+  let program = programForUser(user);
+  await program.rpc.finish(list.data.name, {
+    accounts: {
+      list: list.publicKey,
+      listOwner: listOwner.key.publicKey,
+      item: item.publicKey,
+      user: user.key.publicKey,
+    },
+  });
+
+  let [listData, itemData] = await Promise.all([
+    program.account.todoList.fetch(list.publicKey),
+    expectAccountClosed
+      ? null
+      : await program.account.listItem.fetch(item.publicKey),
+  ]);
+
+  return {
+    list: {
+      publicKey: list.publicKey,
+      data: listData,
+    },
+    item: {
+      publicKey: item.publicKey,
+      data: itemData,
+    },
+  };
+}
+
 describe("New list", () => {
   // Configure the client to use the local cluster.
 
@@ -290,5 +326,29 @@ describe("Cancel", () => {
       cancelResult.list.data.lines,
       "Cancel removes data from list"
     ).deep.equals([]);
+  });
+});
+
+describe("Finish", () => {
+  it("List owner then item creator", async () => {
+    const [owner, adder] = await createUsers(2);
+
+    const list = await createList(owner, "list");
+    const ownerInitial = await getAccountBalance(owner.key.publicKey);
+
+    const bounty = 5 * LAMPORTS_PER_SOL;
+    const { item } = await addItem({
+      list,
+      user: adder,
+      bounty,
+      name: "An item",
+    });
+
+    expect(
+      await getAccountBalance(item.publicKey),
+      "Initialized account has bounty"
+    ).equals(bounty);
+
+    const firstResult = await finishItem({});
   });
 });
