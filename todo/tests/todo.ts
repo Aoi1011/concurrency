@@ -18,7 +18,7 @@ const mainProgram = anchor.workspace.Todo;
 
 async function getAccountBalance(pubkey) {
   let account = await provider.connection.getAccountInfo(pubkey);
-  return account.lamports ?? 0;
+  return account?.lamports ?? 0;
 }
 
 function expectBalance(actual, expected, message, slack = 20000) {
@@ -26,7 +26,7 @@ function expectBalance(actual, expected, message, slack = 20000) {
 }
 
 async function createUser(airdropBalance?: number): Promise<Owner> {
-  airdropBalance = airdropBalance ?? 2 * LAMPORTS_PER_SOL;
+  airdropBalance = airdropBalance ?? 10 * LAMPORTS_PER_SOL;
   let user = anchor.web3.Keypair.generate();
   let sig1 = await provider.connection.requestAirdrop(
     user.publicKey,
@@ -48,18 +48,10 @@ async function createUser(airdropBalance?: number): Promise<Owner> {
   };
 }
 
-async function requestAirdrop(owner: Owner) {
-  let signature = await provider.connection.requestAirdrop(
-    owner.key.publicKey,
-    2 * LAMPORTS_PER_SOL
-  );
-  await provider.connection.confirmTransaction(signature);
-}
-
 function createUsers(numUsers) {
   let promisses = [];
   for (let i = 0; i < numUsers; i++) {
-    promisses.push(createUser(1));
+    promisses.push(createUser());
   }
 
   return Promise.all(promisses);
@@ -158,15 +150,15 @@ describe("add", () => {
       result.item.publicKey,
     ]);
     expect(
-      result.item.data.creator.toString(),
+      result.item.data.creattor.toString(),
       "Item marked with creator"
     ).equals(adder.key.publicKey.toString());
     expect(
-      result.item.data.creatorFinished,
+      result.item.data.creatorFinshed,
       "creator_finished is false"
     ).equals(false);
     expect(
-      result.item.data.listOwnerFinished,
+      result.item.data.listOwnerFinshed,
       "list_owner_finished is false"
     ).equals(false);
     expect(result.item.data.name, "Name is set").equals("Do something");
@@ -193,5 +185,45 @@ describe("add", () => {
       result.item.publicKey,
       again.item.publicKey,
     ]);
+  });
+
+  it("fails if the list is full", async () => {
+    const MAX_LIST_SIZE = 4;
+    const owner = await createUser();
+    const list = await createList(owner, "list", MAX_LIST_SIZE);
+
+    // Add 4 items, in parallel for speed
+    await Promise.all(
+      new Array(MAX_LIST_SIZE).fill(0).map((_, i) => {
+        return addItem({
+          list,
+          user: owner,
+          name: `Item ${i}`,
+          bounty: 1 * LAMPORTS_PER_SOL,
+        });
+      })
+    );
+
+    const adderStartingBalance = await getAccountBalance(owner.key.publicKey);
+
+    // Now the list should be full.
+    try {
+      let addResult = await addItem({
+        list,
+        user: owner,
+        name: "Full item",
+        bounty: 1 * LAMPORTS_PER_SOL,
+      });
+
+      console.log(addResult, { depth: null });
+      expect.fail("Adding to full list should be have failed");
+    } catch (e) {
+      expect(e.toString()).contains("This list is full");
+    }
+
+    let adderNewBalance = await getAccountBalance(owner.key.publicKey);
+    expect(adderStartingBalance, "Adder balance is unchanged").equals(
+      adderNewBalance
+    );
   });
 });
