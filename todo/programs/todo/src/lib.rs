@@ -116,7 +116,7 @@ pub mod todo {
             list.lines.retain(|key| key != item_key);
             item.close(ctx.accounts.list_owner.to_account_info())?;
         }
-        
+
         Ok(())
     }
  }
@@ -149,7 +149,13 @@ fn name_seed(name: &str) -> &[u8] {
 #[derive(Accounts)]
 #[instruction(name: String, capacity: u16, list_bump: u8)]
 pub struct NewList<'info> {
-    #[account(init, payer = user, space = TodoList::space(&name, capacity), seeds=[b"todolist", user.to_account_info().key.as_ref(), name_seed(&name)], bump=list_bump)]
+    #[account(
+        init, 
+        payer = user, 
+        space = TodoList::space(&name, capacity), 
+        seeds=[b"todolist", user.to_account_info().key.as_ref(), name_seed(&name)], 
+        bump=list_bump
+    )]
     pub list: Account<'info, TodoList>,
     pub user: Signer<'info>,
     pub system_program: Program<'info, System>,
