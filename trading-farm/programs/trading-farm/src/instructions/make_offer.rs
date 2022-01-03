@@ -40,3 +40,34 @@ pub struct MakeOffer<'info> {
     pub system_program: Program<'info, System>,
     pub rent: Sysvar<'info, Rent>,
 }
+
+pub fn handler(
+    ctx: Context<MakeOffer>, 
+    escrowed_tokens_of_offer_maker_bump: u8, 
+    im_offering_this_much: u64, 
+    how_much_i_want_of_what_you_have: u64
+) -> ProgramResult {
+    let offer = &mut ctx.accounts.offer;
+    offer.who_made_the_offer = ctx.accounts.who_made_the_offer.key();
+    offer.kind_of_token_wanted_in_return = ctx.accounts.kind_of_token_wanted_in_return.key();
+    offer.amount_received_if_offer_accepted = how_much_i_want_of_what_you_have;
+    offer.escrowed_tokens_of_offer_maker_bump = escrowed_tokens_of_offer_maker_bump;
+
+    anchor_spl::token::transfer(
+        CpiContext::new(
+            ctx.accounts.token_program.to_account_info(), 
+            anchor_spl::token::Transfer {
+                from: ctx
+                    .accounts
+                    .token_account_from_who_made_the_offer
+                    .to_account_info(),
+                to: ctx
+                    .accounts
+                    .escrowed_tokens_of_offer_maker
+                    .to_account_info(),
+                authority: ctx.accounts.who_made_the_offer.to_account_info(),
+            },
+        ), 
+        im_offering_this_much
+    )
+}
