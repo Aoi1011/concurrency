@@ -62,7 +62,7 @@ pub fn handler(ctx: Context<AcceptOffer>) -> ProgramResult {
         ctx.accounts.offer.amount_received_if_offer_accepted
     )?;
 
-    // Transfer what's on the esxrowed account to the offer reciever
+    // Transfer what's on the escrowed account to the offer reciever
     anchor_spl::token::transfer(
         CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(),
@@ -88,6 +88,7 @@ pub fn handler(ctx: Context<AcceptOffer>) -> ProgramResult {
         ctx.accounts.escrowed_tokens_of_offer_maker.amount
     )?;
 
+    // Close the escrow account
     anchor_spl::token::close_account(
         CpiContext::new_with_signer(
             ctx.accounts.token_program.to_account_info(), 
@@ -108,5 +109,6 @@ pub fn handler(ctx: Context<AcceptOffer>) -> ProgramResult {
                 ctx.accounts.offer.key().as_ref(),
                 &[ctx.accounts.offer.escrowed_tokens_of_offer_maker_bump],
             ]],
-        ))
+        )
+    )
 }
