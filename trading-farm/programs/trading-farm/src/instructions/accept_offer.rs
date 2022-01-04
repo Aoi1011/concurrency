@@ -41,3 +41,72 @@ pub struct AcceptOffer<'info> {
 
     pub token_program: Program<'info, Token>,
 }
+
+pub fn handler(ctx: Context<AcceptOffer>) -> ProgramResult {
+    // Transfer token to who started the offer
+    anchor_spl::token::transfer(
+        CpiContext::new(
+            ctx.accounts.token_program.to_account_info(), 
+            anchor_spl::token::Transfer {
+                from: ctx
+                    .accounts
+                    .account_holding_what_receiver_will_give
+                    .to_account_info(),
+                to: ctx
+                    .accounts
+                    .account_holding_what_maker_will_get
+                    .to_account_info(),
+                authority: ctx.accounts.who_is_taking_the_offer.to_account_info(),
+            },
+        ), 
+        ctx.accounts.offer.amount_received_if_offer_accepted
+    )?;
+
+    // Transfer what's on the esxrowed account to the offer reciever
+    anchor_spl::token::transfer(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(),
+            anchor_spl::token::Transfer {
+                from: ctx
+                    .accounts
+                    .escrowed_tokens_of_offer_maker
+                    .to_account_info(),
+                to: ctx
+                    .accounts
+                    .account_holding_what_receiver_will_get
+                    .to_account_info(),
+                authority: ctx
+                    .accounts
+                    .escrowed_tokens_of_offer_maker
+                    .to_account_info()
+            },
+            &[&[
+                ctx.accounts.offer.key().as_ref(),
+                &[ctx.accounts.offer.escrowed_tokens_of_offer_maker_bump],
+            ]],
+        ),
+        ctx.accounts.escrowed_tokens_of_offer_maker.amount
+    )?;
+
+    anchor_spl::token::close_account(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.to_account_info(), 
+            anchor_spl::token::CloseAccount {
+                account: ctx
+                    .accounts
+                    .escrowed_tokens_of_offer_maker
+                    .to_account_info(),
+                destination: ctx
+                    .accounts
+                    .who_made_the_offer.to_account_info(),
+                authority: ctx
+                    .accounts
+                    .escrowed_tokens_of_offer_maker
+                    .to_account_info(),
+            }, 
+            &[&[
+                ctx.accounts.offer.key().as_ref(),
+                &[ctx.accounts.offer.escrowed_tokens_of_offer_maker_bump],
+            ]],
+        ))
+}
