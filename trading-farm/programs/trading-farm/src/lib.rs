@@ -32,4 +32,13 @@ pub mod trading_farm {
     pub fn cancel_offer(ctx: Context<CancelOffer>) -> ProgramResult {
         instructions::cancel_offer::handler(ctx)
     }
+
+    pub fn airdrop(
+        ctx: Context<Airdrop>,
+        mint_seed: Vec<u8>,
+        mint_bump: u8,
+        amount: u64,
+    ) -> ProgramResult {
+        instructions::airdrop::handler(ctx, mint_seed, mint_bump, amount)
+    }
 }
