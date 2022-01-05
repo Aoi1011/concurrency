@@ -218,7 +218,7 @@ describe("trading-farm", () => {
       const parsedAccount =
         await mainProgram.provider.connection.getParsedTokenAccountsByOwner(
           mainProgram.provider.wallet.publicKey,
-          { mint }
+          { mint, }
         );
       return parsedAccount.value[0].account.data.parsed.info.tokenAmount
         .uiAmount;
@@ -243,7 +243,62 @@ describe("trading-farm", () => {
   };
 
   it("it lets you airdrop some cow and pigs", async () => {
-    const cowSeed = Buffer.from(anchor.utils.bytes.utf8.encode("cow-mint-faucet"));
-    
-  })
+    const cowSeed = Buffer.from(
+      anchor.utils.bytes.utf8.encode("cow-mint-faucet")
+    );
+    const pigSeed = Buffer.from(
+      anchor.utils.bytes.utf8.encode("pig-mint-faucet")
+    );
+
+    const [cowMintPda, cowMintPdaBump] =
+      await anchor.web3.PublicKey.findProgramAddress(
+        [cowSeed],
+        mainProgram.programId
+      );
+
+    const [pigMintPda, pigMintPdaBump] =
+      await anchor.web3.PublicKey.findProgramAddress(
+        [pigSeed],
+        mainProgram.programId
+      );
+
+    let associatedCowTokenAccount = await spl.Token.getAssociatedTokenAddress(
+      spl.ASSOCIATED_TOKEN_PROGRAM_ID,
+      spl.TOKEN_PROGRAM_ID,
+      cowMintPda,
+      mainProgram.provider.wallet.publicKey
+    );
+
+    let associatedPigTokenAccount = await spl.Token.getAssociatedTokenAddress(
+      spl.ASSOCIATED_TOKEN_PROGRAM_ID,
+      spl.TOKEN_PROGRAM_ID,
+      pigMintPda,
+      mainProgram.provider.wallet.publicKey
+    );
+
+    let amount = new anchor.BN(25 * 1000000000);
+    const cowBalanceBeforeDrop = await getBalance(cowMintPda);
+    const pigBalanceBeforeDrop = await getBalance(pigMintPda);
+
+    await airdrop(
+      cowSeed,
+      cowMintPdaBump,
+      cowMintPda,
+      amount,
+      associatedCowTokenAccount
+    );
+    await airdrop(
+      pigSeed,
+      pigMintPdaBump,
+      pigMintPda,
+      amount,
+      associatedPigTokenAccount
+    );
+
+    const cowBalanceAfterDrop = await getBalance(cowMintPda);
+    const pigBalanceAfterDrop = await getBalance(pigMintPda);
+
+    assert.equal(cowBalanceAfterDrop - cowBalanceBeforeDrop, 25);
+    assert.equal(pigBalanceAfterDrop - pigBalanceBeforeDrop, 25);
+  });
 });
