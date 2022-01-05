@@ -28,4 +28,8 @@ pub mod trading_farm {
     pub fn accept_offer(ctx: Context<AcceptOffer>) -> ProgramResult {
         instructions::accept_offer::handler(ctx)
     }
+
+    pub fn cancel_offer(ctx: Context<CancelOffer>) -> ProgramResult {
+        instructions::cancel_offer::handler(ctx)
+    }
 }
