@@ -5,16 +5,15 @@ import * as assert from "assert";
 import * as spl from "@solana/spl-token";
 import NodeWallet from "@project-serum/anchor/dist/cjs/provider";
 import { PublicKey } from "@solana/web3.js";
+// import workspace from "@project-serum/anchor/src/workspace";
 
 const provider = anchor.Provider.env();
 anchor.setProvider(provider);
+// @ts-ignore
 const mainProgram = anchor.workspace.TradingFarm;
 
 describe("trading-farm", () => {
   // Configure the client to use the local cluster.
-  
-
- 
 
   let offerMakerPigTokenAccount: anchor.web3.PublicKey;
   let offerTakerCowTokenAccount: anchor.web3.PublicKey;
@@ -27,21 +26,85 @@ describe("trading-farm", () => {
   let offerTaker = anchor.web3.Keypair.generate();
 
   before(async () => {
-    const wallet = program.provider.wallet as NodeWallet;
+    const wallet = mainProgram.provider.wallet;
 
     cowMint = await spl.Token.createMint(
-      program.provider.connection,
+      mainProgram.provider.connection,
       wallet.payer,
       wallet.publicKey,
       wallet.publicKey,
       0,
       spl.TOKEN_PROGRAM_ID
     );
+
+    pigMint = await spl.Token.createMint(
+      mainProgram.provider.connection,
+      wallet.payer,
+      wallet.publicKey,
+      wallet.publicKey,
+      0,
+      spl.TOKEN_PROGRAM_ID
+    );
+
+    offerMakerCowTokenAccount = await cowMint.createAssociatedTokenAccount(
+      mainProgram.provider.wallet.publicKey
+    );
+
+    offerMakerPigTokenAccount = await pigMint.createAssociatedTokenAccount(
+      mainProgram.provider.wallet.publicKey
+    );
+
+    offerTakerCowTokenAccount = await cowMint.createAssociatedTokenAccount(
+      offerTaker.publicKey
+    );
+
+    offerTakerPigTokenAccount = await pigMint.createAssociatedTokenAccount(
+      offerTaker.publicKey
+    );
+
+    await cowMint.mintTo(
+      offerMakerCowTokenAccount,
+      mainProgram.provider.wallet.publicKey,
+      [],
+      100
+    );
+    await pigMint.mintTo(
+      offerTakerPigTokenAccount,
+      mainProgram.provider.wallet.publicKey,
+      [],
+      100
+    );
   });
 
-  it("Is initialized!", async () => {
+  it("It let you place and accept offers for toekns", async () => {
     // Add your test here.
-    const tx = await program.rpc.initialize({});
-    console.log("Your transaction signature", tx);
+    const offer = anchor.web3.Keypair.generate();
+    const [escrowedTokensOfferMaker, escrowedTokensOfOfferMakerBump] =
+      await anchor.web3.PublicKey.findProgramAddress(
+        [offer.publicKey.toBuffer()],
+        mainProgram.programId
+      );
+
+    await mainProgram.rpc.makeOffer(
+      escrowedTokensOfOfferMakerBump,
+      new anchor.BN(2),
+      new anchor.BN(4),
+      {
+        accounts: {
+          offer: offer.publicKey,
+          whoMadeTheOffer: mainProgram.provider.wallet.publicKey,
+          tokenAccountFromWhoMadeTheOffer: offerMakerCowTokenAccount,
+          escrowedTokensOfOfferMaker: escrowedTokensOfferMaker,
+          kindOfTokenOffered: cowMint.publicKey,
+          kindOfTokenWantedInReturn: pigMint.publicKey,
+          tokenProgram: spl.TOKEN_PROGRAM_ID,
+          systemProgram: anchor.web3.SystemProgram.programId,
+          rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+        },
+        signers: [offer],
+      }
+    );
+
+    assert.equal(2, (await cowMint.getAccountInfo(escrowedTokensOfferMaker)).amount.toNumber());
   });
 });
