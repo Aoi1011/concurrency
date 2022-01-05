@@ -212,4 +212,38 @@ describe("trading-farm", () => {
       )
     );
   });
+
+  const getBalance = async (mint) => {
+    try {
+      const parsedAccount =
+        await mainProgram.provider.connection.getParsedTokenAccountsByOwner(
+          mainProgram.provider.wallet.publicKey,
+          { mint }
+        );
+      return parsedAccount.value[0].account.data.parsed.info.tokenAmount
+        .uiAmount;
+    } catch (err) {
+      console.log("No mints found for wallet", err);
+    }
+  };
+
+  const airdrop = async (seed, bump, mintPda, amount, associatedAccount) => {
+    await mainProgram.rpc.airdrop(seed, bump, amount, {
+      accounts: {
+        payer: mainProgram.provider.wallet.publicKey,
+        mint: mintPda,
+        destination: associatedAccount,
+        rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+        tokenProgram: spl.TOKEN_PROGRAM_ID,
+        systemProgram: anchor.web3.SystemProgram.programId,
+        associatedTokenProgram: spl.ASSOCIATED_TOKEN_PROGRAM_ID,
+      },
+      signers: [],
+    });
+  };
+
+  it("it lets you airdrop some cow and pigs", async () => {
+    const cowSeed = Buffer.from(anchor.utils.bytes.utf8.encode("cow-mint-faucet"));
+    
+  })
 });
