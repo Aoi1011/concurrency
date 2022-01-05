@@ -136,11 +136,80 @@ describe("trading-farm", () => {
       signers: [offerTaker],
     });
 
-    assert.equal(offerMakerCurrentPigAmounts + 4, (await pigMint.getAccountInfo(offerMakerPigTokenAccount)).amount.toNumber());
-    assert.equal(offerReceiveCuurentPigAmounts - 4, (await pigMint.getAccountInfo(offerTakerPigTokenAccount)).amount.toNumber());
+    assert.equal(
+      offerMakerCurrentPigAmounts + 4,
+      (
+        await pigMint.getAccountInfo(offerMakerPigTokenAccount)
+      ).amount.toNumber()
+    );
+    assert.equal(
+      offerReceiveCuurentPigAmounts - 4,
+      (
+        await pigMint.getAccountInfo(offerTakerPigTokenAccount)
+      ).amount.toNumber()
+    );
 
     // accounts closed after transactions completed (e.g. accepted)
-    assert.equal(null, await mainProgram.provider.connection.getAccountInfo(offer.publicKey));
-    assert.equal(null, await mainProgram.provider.connection.getAccountInfo(escrowedTokensOfferMaker));
+    assert.equal(
+      null,
+      await mainProgram.provider.connection.getAccountInfo(offer.publicKey)
+    );
+    assert.equal(
+      null,
+      await mainProgram.provider.connection.getAccountInfo(
+        escrowedTokensOfferMaker
+      )
+    );
+  });
+
+  it("it lets you cancel offers after placing them", async () => {
+    const offer = anchor.web3.Keypair.generate();
+    const [escrowedTokensOfOfferMaker, escrowedTokensOfOfferMakerBump] =
+      await anchor.web3.PublicKey.findProgramAddress(
+        [offer.publicKey.toBuffer()],
+        mainProgram.programId
+      );
+
+    await mainProgram.rpc.makeOffer(
+      escrowedTokensOfOfferMakerBump,
+      new anchor.BN(2),
+      new anchor.BN(4),
+      {
+        accounts: {
+          offer: offer.publicKey,
+          whoMadeTheOffer: mainProgram.provider.wallet.publicKey,
+          tokenAccountFromWhoMadeTheOffer: offerMakerCowTokenAccount,
+          escrowedTokensOfOfferMaker: escrowedTokensOfOfferMaker,
+          kindOfTokenOffered: cowMint.publicKey,
+          kindOfTokenWantedInReturn: pigMint.publicKey,
+          tokenProgram: spl.TOKEN_PROGRAM_ID,
+          systemProgram: anchor.web3.SystemProgram.programId,
+          rent: anchor.web3.SYSVAR_RENT_PUBKEY,
+        },
+        signers: [offer],
+      }
+    );
+
+    await mainProgram.rpc.cancelOffer({
+      accounts: {
+        offer: offer.publicKey,
+        whoMadeTheOffer: mainProgram.provider.wallet.publicKey,
+        whereTheEscrowedAccountWasFundedFrom: offerMakerCowTokenAccount,
+        escrowedTokensOfOfferMaker: escrowedTokensOfOfferMaker,
+        tokenProgram: spl.TOKEN_PROGRAM_ID,
+      },
+    });
+
+    // accounts closed after transactions completed (e.g accepted)
+    assert.equal(
+      null,
+      await mainProgram.provider.connection.getAccountInfo(offer.publicKey)
+    );
+    assert.equal(
+      null,
+      await mainProgram.provider.connection.getAccountInfo(
+        escrowedTokensOfOfferMaker
+      )
+    );
   });
 });
