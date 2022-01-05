@@ -105,6 +105,42 @@ describe("trading-farm", () => {
       }
     );
 
-    assert.equal(2, (await cowMint.getAccountInfo(escrowedTokensOfferMaker)).amount.toNumber());
+    assert.equal(
+      2,
+      (await cowMint.getAccountInfo(escrowedTokensOfferMaker)).amount.toNumber()
+    );
+
+    const offerMakerCurrentCowAmounts = (
+      await cowMint.getAccountInfo(offerMakerCowTokenAccount)
+    ).amount.toNumber();
+    const offerMakerCurrentPigAmounts = (
+      await pigMint.getAccountInfo(offerMakerPigTokenAccount)
+    ).amount.toNumber();
+
+    const offerReceiveCuurentPigAmounts = (
+      await pigMint.getAccountInfo(offerTakerPigTokenAccount)
+    ).amount.toNumber();
+
+    await mainProgram.rpc.acceptOffer({
+      accounts: {
+        offer: offer.publicKey,
+        whoMadeTheOffer: mainProgram.provider.wallet.publicKey,
+        whoIsTakingTheOffer: offerTaker.publicKey,
+        escrowedTokensOfOfferMaker: escrowedTokensOfferMaker,
+        accountHoldingWhatMakerWillGet: offerMakerPigTokenAccount,
+        accountHoldingWhatReceiverWillGive: offerTakerPigTokenAccount,
+        accountHoldingWhatReceiverWillGet: offerTakerCowTokenAccount,
+        kindOfTokenWantedInReturn: pigMint.publicKey,
+        tokenProgram: spl.TOKEN_PROGRAM_ID,
+      },
+      signers: [offerTaker],
+    });
+
+    assert.equal(offerMakerCurrentPigAmounts + 4, (await pigMint.getAccountInfo(offerMakerPigTokenAccount)).amount.toNumber());
+    assert.equal(offerReceiveCuurentPigAmounts - 4, (await pigMint.getAccountInfo(offerTakerPigTokenAccount)).amount.toNumber());
+
+    // accounts closed after transactions completed (e.g. accepted)
+    assert.equal(null, await mainProgram.provider.connection.getAccountInfo(offer.publicKey));
+    assert.equal(null, await mainProgram.provider.connection.getAccountInfo(escrowedTokensOfferMaker));
   });
 });
