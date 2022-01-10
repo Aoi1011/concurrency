@@ -10,14 +10,10 @@ pub struct Vote<'info> {
     pub vote_account: Account<'info, VoteAccount>,
 }
 
-pub fn handler_crunchy(ctx: Context<Vote>) -> ProgramResult {
+pub fn handler(ctx: Context<Vote>) -> ProgramResult {
     let vote_account = &mut ctx.accounts.vote_account;
     vote_account.crunchy += 1;
     Ok(())
 }
 
-pub fn handler_smooth(ctx: Context<Vote>) -> ProgramResult {
-    let vote_account = &mut ctx.accounts.vote_account;
-    vote_account.smooth += 1;
-    Ok(())
-}
+
