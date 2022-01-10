@@ -1,6 +1,28 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import {
+  ConnectionProvider,
+  WalletProvider,
+} from "@solana/wallet-adapter-react";
+import { WalletDialogProvider } from "@solana/wallet-adapter-material-ui";
+import {
+  LedgerWalletAdapter,
+  PhantomWalletAdapter,
+  SlopeWalletAdapter,
+  SolflareWalletAdapter,
+  SolletExtensionWalletAdapter,
+  SolletWalletAdapter,
+  TorusWalletAdapter,
+} from "@solana/wallet-adapter-wallets";
+import {
+  WalletModalProvider,
+  WalletDisconnectButton,
+  WalletMultiButton,
+} from "@solana/wallet-adapter-react-ui";
+import { SnackbarProvider, useSnackbar } from "notistack";
+import { createTheme, ThemeProvider } from "@material-ui/core";
+import { blue, orange } from "@material-ui/core/colors";
+import { useCallback, useEffect, useState } from "react";
+import { web3 } from "@project-serum/anchor";
+
 
 function App() {
   return (
