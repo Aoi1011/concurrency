@@ -4,7 +4,6 @@ pub mod instructions;
 pub mod state;
 
 use instructions::*;
-use state::*;
 
 declare_id!("DoQuqMVDohK2yMPxuZqLcS8KP2aDrbaStuto37Ce7FYR");
 
