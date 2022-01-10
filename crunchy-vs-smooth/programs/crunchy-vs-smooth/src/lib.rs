@@ -16,5 +16,7 @@ pub mod crunchy_vs_smooth {
         instructions::initialize::handler(ctx)
     }
 
-    pub fn 
+    pub fn vote_crunchy(ctx: Context<VoteCrunchy>) -> ProgramResult {
+        instructions::vote_crunchy::handler(ctx)
+    }
 }
