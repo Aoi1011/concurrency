@@ -19,7 +19,7 @@ pub struct Initialize<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn initialize(ctx: Context<Initialize>) -> ProgramResult {
+pub fn handler(ctx: Context<Initialize>) -> ProgramResult {
     let vote_account = &mut ctx.accounts.vote_account;
     vote_account.crunchy = 0;
     vote_account.smooth = 0;
