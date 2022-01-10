@@ -6,7 +6,7 @@ pub mod state;
 use instructions::*;
 use state::*;
 
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("DoQuqMVDohK2yMPxuZqLcS8KP2aDrbaStuto37Ce7FYR");
 
 #[program]
 pub mod crunchy_vs_smooth {
