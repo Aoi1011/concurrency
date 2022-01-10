@@ -59,4 +59,24 @@ describe("crunchy-vs-smooth", () => {
       account.crunchy.toString() == "1" && account.smooth.toString() == "0"
     );
   });
+
+  it("Votes correctly for smooth", async () => {
+    console.log("Testing voteSmooth...");
+    await program.rpc.voteSmooth({
+      accounts: {
+        voteAccount: voteAccount.publicKey,
+      },
+    });
+
+    const account = await program.account.voteAccount.fetch(
+      voteAccount.publicKey
+    );
+
+    console.log("Crunchy: ", account.crunchy.toString());
+    console.log("Smooth: ", account.smooth.toString());
+
+    asset.ok(
+      account.crunchy.toString() == "1" && account.smooth.toString() == "1"
+    );
+  });
 });
