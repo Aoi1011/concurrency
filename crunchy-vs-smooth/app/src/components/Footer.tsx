@@ -10,6 +10,7 @@ import {
 import React from "react";
 import TwitterIcon from "@material-ui/icons/Twitter";
 import GitHubIcon from "@material-ui/icons/GitHub";
+import { PublicKey, Keypair } from "@solana/web3.js";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -27,7 +28,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function Footer() {
+interface FooterProps {
+  programID: PublicKey;
+  voteAccount: Keypair;
+}
+
+function Footer({ programID, voteAccount }: FooterProps) {
   const classes = useStyles();
   return (
     <AppBar position="static" className={classes.root}>
