@@ -20,24 +20,15 @@ import {
 import { SnackbarProvider, useSnackbar } from "notistack";
 import { createTheme, ThemeProvider } from "@material-ui/core";
 import { blue, orange } from "@material-ui/core/colors";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { web3 } from "@project-serum/anchor";
 import { Keypair } from "@solana/web3.js";
 
 import Main from "./components/Main";
+import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 
-const localnet = "http://127.0.0.1:8899";
-const network = localnet;
-
-const wallets = [
-  LedgerWalletAdapter,
-  PhantomWalletAdapter,
-  SlopeWalletAdapter,
-  SolflareWalletAdapter,
-  SolletExtensionWalletAdapter,
-  SolletWalletAdapter,
-  TorusWalletAdapter,
-];
+// const localnet = "http://127.0.0.1:8899";
+// const network = localnet;
 
 const theme = createTheme({
   palette: {
@@ -77,6 +68,21 @@ function AppWrappedWithProviders() {
   const { enqueueSnackbar } = useSnackbar();
   const [voteAccount, setVoteAccount] = useState<Keypair>();
 
+  const network = WalletAdapterNetwork.Devnet;
+
+  const wallets = useMemo(
+    () => [
+      new PhantomWalletAdapter(),
+      new SlopeWalletAdapter(),
+      new SolflareWalletAdapter(),
+      new TorusWalletAdapter(),
+      new LedgerWalletAdapter(),
+      new SolletWalletAdapter({ network }),
+      new SolletExtensionWalletAdapter({ network }),
+    ],
+    [network]
+  );
+
   useEffect(() => {
     fetch("/voteAccount")
       .then((response) => response.json())
@@ -92,24 +98,26 @@ function AppWrappedWithProviders() {
         console.log(err);
         enqueueSnackbar("Could not fetch vote account", { variant: "error" });
       });
+  }, [enqueueSnackbar]);
 
-    const onWalletError = useCallback(
-      (error) => {
-        enqueueSnackbar(
-          error.message ? `${error.name}: ${error.message}` : error.name,
-          { variant: "error" }
-        );
-        console.error(error);
-      },
-      [enqueueSnackbar]
-    );
-  });
+  const onWalletError = useCallback(
+    (error) => {
+      enqueueSnackbar(
+        error.message ? `${error.name}: ${error.message}` : error.name,
+        { variant: "error" }
+      );
+      console.error(error);
+    },
+    [enqueueSnackbar]
+  );
 
   return (
     <WalletProvider wallets={wallets} onError={onWalletError} autoConnect>
-      
+      <WalletDialogProvider>
+        <Main network={network} voteAccount={voteAccount!} />
+      </WalletDialogProvider>
     </WalletProvider>
-  )
+  );
 }
 
 function App() {
