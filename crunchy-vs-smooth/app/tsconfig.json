@@ -21,6 +21,11 @@
     "jsx": "react-jsx",
     "noImplicitAny": true,
   },
+  "paths": {
+    "crypto": [
+      "../../node_modules/crypto-js"
+    ]
+  },
   "include": [
     "src"
   ]
