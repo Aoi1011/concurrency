@@ -2,15 +2,16 @@ import {
   ConnectionProvider,
   WalletProvider,
 } from "@solana/wallet-adapter-react";
+import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import { WalletDialogProvider } from "@solana/wallet-adapter-material-ui";
 import {
-  LedgerWalletAdapter,
+  // LedgerWalletAdapter,
   PhantomWalletAdapter,
-  SlopeWalletAdapter,
-  SolflareWalletAdapter,
-  SolletExtensionWalletAdapter,
-  SolletWalletAdapter,
-  TorusWalletAdapter,
+  // SlopeWalletAdapter,
+  // SolflareWalletAdapter,
+  // SolletExtensionWalletAdapter,
+  // SolletWalletAdapter,
+  // TorusWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 import {
   WalletModalProvider,
@@ -22,10 +23,11 @@ import { createTheme, ThemeProvider } from "@material-ui/core";
 import { blue, orange } from "@material-ui/core/colors";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { web3 } from "@project-serum/anchor";
-import { Keypair } from "@solana/web3.js";
+import { clusterApiUrl, Keypair } from "@solana/web3.js";
 
 import Main from "./components/Main";
-import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
+
+require("@solana/wallet-adapter-react-ui/styles.css");
 
 // const localnet = "http://127.0.0.1:8899";
 // const network = localnet;
@@ -69,16 +71,18 @@ function AppWrappedWithProviders() {
   const [voteAccount, setVoteAccount] = useState<Keypair>();
 
   const network = WalletAdapterNetwork.Devnet;
+  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+  // const network = "http://127.0.0.1:8899";
 
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
-      new SlopeWalletAdapter(),
-      new SolflareWalletAdapter(),
-      new TorusWalletAdapter(),
-      new LedgerWalletAdapter(),
-      new SolletWalletAdapter({ network }),
-      new SolletExtensionWalletAdapter({ network }),
+      // new SlopeWalletAdapter(),
+      // new SolflareWalletAdapter(),
+      // new TorusWalletAdapter(),
+      // new LedgerWalletAdapter(),
+      // new SolletWalletAdapter({ network }),
+      // new SolletExtensionWalletAdapter({ network }),
     ],
     [network]
   );
@@ -112,22 +116,24 @@ function AppWrappedWithProviders() {
   );
 
   return (
-    <WalletProvider wallets={wallets} onError={onWalletError} autoConnect>
-      <WalletDialogProvider>
-        <Main network={network} voteAccount={voteAccount!} />
-      </WalletDialogProvider>
-    </WalletProvider>
+    <ConnectionProvider endpoint={endpoint}>
+      <WalletProvider wallets={wallets} onError={onWalletError} autoConnect>
+        <WalletModalProvider>
+          <WalletMultiButton />
+          <WalletDisconnectButton />
+          <Main network={network} voteAccount={voteAccount!} />
+        </WalletModalProvider>
+      </WalletProvider>
+    </ConnectionProvider>
   );
 }
 
 function App() {
-  const network = WalletAdapterNetwork.Devnet;
+  // const network = WalletAdapterNetwork.Devnet;
   return (
     <ThemeProvider theme={theme}>
       <SnackbarProvider>
-        <ConnectionProvider endpoint={network}>
-          <AppWrappedWithProviders />
-        </ConnectionProvider>
+        <AppWrappedWithProviders />
       </SnackbarProvider>
     </ThemeProvider>
   );
