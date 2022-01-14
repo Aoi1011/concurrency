@@ -136,11 +136,12 @@ function AppWrappedWithProviders() {
 function App() {
   // const network = WalletAdapterNetwork.Devnet;
   return (
-    <ThemeProvider theme={theme}>
-      <SnackbarProvider>
-        <AppWrappedWithProviders />
-      </SnackbarProvider>
-    </ThemeProvider>
+    // <ThemeProvider theme={theme}>
+    //   <SnackbarProvider>
+    //     <AppWrappedWithProviders />
+    //   </SnackbarProvider>
+    // </ThemeProvider>
+    <h1>Hello World</h1>
   );
 }
 
