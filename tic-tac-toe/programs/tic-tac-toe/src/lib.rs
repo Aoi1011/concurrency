@@ -1,4 +1,6 @@
 use anchor_lang::prelude::*;
+use instructions::*;
+use state::game::Tile;
 
 pub mod errors;
 pub mod instructions;
@@ -10,10 +12,7 @@ declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 pub mod tic_tac_toe {
     use super::*;
 
-    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
-        Ok(())
+    pub fn setup_game(ctx: Context<SetupGame>, player_two: Pubkey) -> Result<()> {
+        instructions::setup_game::setup_game(ctx, player_two)
     }
 }
-
-#[derive(Accounts)]
-pub struct Initialize {}
