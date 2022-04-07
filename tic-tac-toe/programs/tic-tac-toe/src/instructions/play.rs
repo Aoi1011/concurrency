@@ -1,7 +1,22 @@
-// use anchor_lang::prelude::*;
+use crate::errors::TickTacToeError;
+use crate::state::{Game, Tile};
+use anchor_lang::prelude::*;
 
-// #[derive(Accounts)]
-// pub struct SetupGame<'info> {
-//     #[account(init)]
-//     pub game: Account<'info, Game>,
-// }
+pub fn play(ctx: Context<Play>, tile: Tile) -> Result<()> {
+    let game = &mut ctx.accounts.game;
+
+    require_keys_eq!(
+        game.current_player(),
+        ctx.accounts.player.key(),
+        TickTacToeError::NotPlayersTurn
+    );
+
+    game.play(&tile)
+}
+
+#[derive(Accounts)]
+pub struct Play<'info> {
+    #[account(mut)]
+    pub game: Account<'info, Game>,
+    pub player: Signer<'info>,
+}
