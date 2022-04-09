@@ -227,25 +227,25 @@ describe("tic-tac-toe", () => {
       ]
     );
 
-    // try {
-    //   await play(
-    //     program,
-    //     gameKeypair.publicKey,
-    //     playerOne,
-    //     { row: 0, column: 2 },
-    //     5,
-    //     { won: { winner: playerOne.publicKey } },
-    //     [
-    //       [{ x: {} }, { x: {} }, { x: {} }],
-    //       [{ o: {} }, { o: {} }, null],
-    //       [null, null, null],
-    //     ]
-    //   );
-    //   chai.assert(false, "should've failed but didn't");
-    // } catch (_err) {
-    //   expect(_err).to.be.instanceOf(AnchorError);
-    //   const err: AnchorError = _err;
-    //   expect(err.error.errorCode.number).to.equal(6002);
-    // }
+    try {
+      await play(
+        program,
+        gameKeypair.publicKey,
+        playerOne,
+        { row: 0, column: 2 },
+        5,
+        { won: { winner: playerOne.publicKey } },
+        [
+          [{ x: {} }, { x: {} }, { x: {} }],
+          [{ o: {} }, { o: {} }, null],
+          [null, null, null],
+        ]
+      );
+      chai.assert(false, "should've failed but didn't");
+    } catch (_err) {
+      expect(_err).to.be.instanceOf(AnchorError);
+      const err: AnchorError = _err;
+      expect(err.error.errorCode.number).to.equal(6002);
+    }
   });
 });
