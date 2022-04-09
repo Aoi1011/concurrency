@@ -1,5 +1,5 @@
 use crate::errors::TickTacToeError;
-use crate::state::{Game, Tile};
+use crate::state::game::*;
 use anchor_lang::prelude::*;
 
 pub fn play(ctx: Context<Play>, tile: Tile) -> Result<()> {
