@@ -2,7 +2,7 @@ use crate::errors::TickTacToeError;
 use anchor_lang::prelude::*;
 use num_derive::*;
 use num_traits::*;
-use std::mem;
+// use std::mem;
 
 #[account]
 pub struct Game {
@@ -34,7 +34,7 @@ pub struct Tile {
 }
 
 impl Game {
-    pub const MAXIMUM_SIZE: usize = (32 * 1) + 1 + (9 * (1 + 1)) + (32 + 1);
+    pub const MAXIMUM_SIZE: usize = (32 * 2) + 1 + (9 * (1 + 1)) + (32 + 1);
 
     pub fn start(&mut self, players: [Pubkey; 2]) -> Result<()> {
         require_eq!(self.turn, 0, TickTacToeError::GameAlreadyStarted);
@@ -118,7 +118,7 @@ impl Game {
         }
 
         // reaching this code means the game has not been won,
-        // so if there are unfilled tiles left, it's still active,
+        // so if there are unfilled tiles left, it's still active
         for row in 0..=2 {
             for column in 0..=2 {
                 if self.board[row][column].is_none() {
@@ -129,7 +129,7 @@ impl Game {
 
         // game has not been won
         // game has no more free tiles
-        // -> game ends in a tile
+        // -> game ends in a tie
         self.state = GameState::Tie;
     }
 }

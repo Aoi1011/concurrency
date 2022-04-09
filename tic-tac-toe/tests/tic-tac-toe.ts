@@ -219,7 +219,7 @@ describe("tic-tac-toe", () => {
       playerOne,
       { row: 0, column: 2 },
       5,
-      { active: {} },
+      { won: { winner: playerOne.publicKey } },
       [
         [{ x: {} }, { x: {} }, { x: {} }],
         [{ o: {} }, { o: {} }, null],
