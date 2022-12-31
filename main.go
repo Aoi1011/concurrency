@@ -7,12 +7,13 @@ import (
 )
 
 func main() {
-	res := restFunc()
+	done := make(chan struct{})
 
+	result := generator(done)
 	for i := 0; i < 5; i++ {
-		num := <-res
-		fmt.Println(num)
+		fmt.Println(<-result)
 	}
+	close(done)
 }
 
 func getLuckyNum(c chan<- int) {
@@ -43,11 +44,30 @@ func restFunc() <-chan int {
 func selectStatement() {
 	gen1, gen2 := make(chan int), make(chan int)
 
-	if n1, ok := <-gen1; ok {
-		fmt.Println(n1)
-	} else if n2, ok := <-gen2; ok {
-		fmt.Println(n2)
-	} else {
-		fmt.Println("neither cannot use")
+	select {
+	case num := <-gen1:
+		fmt.Println(num)
+	case num := <-gen2:
+		fmt.Println(num)
+	default:
+		fmt.Println("neither chan cannot use")
 	}
+}
+
+func generator(done chan struct{}) <-chan int {
+	result := make(chan int)
+
+	go func() {
+		defer close(result)
+	LOOP:
+		for {
+			select {
+			case <-done:
+				break LOOP
+			case result <- 1:
+			}
+		}
+	}()
+
+	return result
 }
