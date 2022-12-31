@@ -9,11 +9,21 @@ import (
 func main() {
 	done := make(chan struct{})
 
-	result := generator(done)
+	gen1 := generator(done, 1)
+	gen2 := generator(done, 2)
+
+	result := fanIn1(done, gen1, gen2)
 	for i := 0; i < 5; i++ {
-		fmt.Println(<-result)
+		<-result
 	}
 	close(done)
+	fmt.Println("main close done")
+
+	for {
+		if _, ok := <-result; !ok {
+			break
+		}
+	}
 }
 
 func getLuckyNum(c chan<- int) {
@@ -54,7 +64,7 @@ func selectStatement() {
 	}
 }
 
-func generator(done chan struct{}) <-chan int {
+func generator(done chan struct{}, num int) <-chan int {
 	result := make(chan int)
 
 	go func() {
@@ -64,8 +74,39 @@ func generator(done chan struct{}) <-chan int {
 			select {
 			case <-done:
 				break LOOP
-			case result <- 1:
+			case result <- num:
 			}
+		}
+	}()
+
+	return result
+}
+
+func fanIn1(done chan struct{}, c1, c2 <-chan int) <-chan int {
+	result := make(chan int)
+
+	go func() {
+		defer fmt.Println("closed fanin")
+		defer close(result)
+
+		for {
+			select {
+			case <-done:
+				fmt.Println("done")
+				return
+
+			case num := <-c1:
+				fmt.Println("send 1")
+				result <- num
+
+			case num := <-c2:
+				fmt.Println("send 2")
+				result <- num
+			default:
+				fmt.Println("continue")
+				continue
+			}
+
 		}
 	}()
 
