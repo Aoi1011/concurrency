@@ -7,16 +7,13 @@ import (
 )
 
 func main() {
-	fmt.Println("What is today's lucky number?")
+	for i := 0; i < 3; i++ {
+		go func() {
+			fmt.Printf("%d", i)
+		}()
+	}
 
-	c := make(chan int)
-	go getLuckyNum(c)
-
-	num := <-c
-
-	fmt.Printf("Today's your lucky number is %d\n", num)
-
-	close(c)
+	time.Sleep(3 * time.Second)
 
 }
 
