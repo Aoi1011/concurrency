@@ -7,17 +7,19 @@ import (
 )
 
 func main() {
-	for i := 0; i < 3; i++ {
-		// go func() {
-		// 	fmt.Printf("%d", i)
-		// }()
+	src := []int{1, 2, 3, 4, 5}
+	dst := []int{}
 
-		go func(i int) {
-			fmt.Println(i)
-		}(i)
+	for _, s := range src {
+		go func(s int) {
+			result := s * 2
+
+			dst = append(dst, result)
+		}(s)
 	}
 
-	time.Sleep(3 * time.Second)
+	time.Sleep(time.Second)
+	fmt.Println(dst)
 
 }
 
