@@ -3,27 +3,16 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"sync"
 	"time"
 )
 
 func main() {
-	src := []int{1, 2, 3, 4, 5}
-	dst := []int{}
+	res := restFunc()
 
-	var mu sync.Mutex
-
-	for _, s := range src {
-		go func(s int) {
-			result := s * 2
-			mu.Lock()
-			dst = append(dst, result)
-			mu.Unlock()
-		}(s)
+	for i := 0; i < 5; i++ {
+		num := <-res
+		fmt.Println(num)
 	}
-
-	time.Sleep(time.Second)
-	fmt.Println(dst)
 }
 
 func getLuckyNum(c chan<- int) {
@@ -35,4 +24,30 @@ func getLuckyNum(c chan<- int) {
 	num := rand.Intn(10)
 
 	c <- num
+}
+
+func restFunc() <-chan int {
+	result := make(chan int)
+
+	go func() {
+		defer close(result)
+
+		for i := 0; i < 5; i++ {
+			result <- i
+		}
+	}()
+
+	return result
+}
+
+func selectStatement() {
+	gen1, gen2 := make(chan int), make(chan int)
+
+	if n1, ok := <-gen1; ok {
+		fmt.Println(n1)
+	} else if n2, ok := <-gen2; ok {
+		fmt.Println(n2)
+	} else {
+		fmt.Println("neither cannot use")
+	}
 }
