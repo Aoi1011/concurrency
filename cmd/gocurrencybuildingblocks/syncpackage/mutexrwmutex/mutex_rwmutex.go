@@ -1,4 +1,4 @@
-package syncpackage
+package mutexrwmutex
 
 func main() {
 	Mutex()
