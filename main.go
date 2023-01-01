@@ -3,32 +3,29 @@ package main
 import (
 	"fmt"
 	"math/rand"
-	"runtime"
 	"sync"
 	"time"
 )
 
 func main() {
-	memConsumed := func() uint64 {
-		runtime.GC()
-		var s runtime.MemStats
-		runtime.ReadMemStats(&s)
-		return s.Sys
-	}
-
-	var s <-chan interface{}
 	var wg sync.WaitGroup
-	noop := func() { wg.Done(); <-s }
 
-	const numGoroutines = 1e4
-	wg.Add(numGoroutines)
-	before := memConsumed()
-	for i := numGoroutines; i > 0; i-- {
-		go noop()
-	}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		fmt.Println("1st goroutine sleeping...")
+		time.Sleep(time.Second * 2)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		fmt.Println("2nd goroutine sleeping...")
+		time.Sleep(time.Second * 2)
+	}()
+
 	wg.Wait()
-	after := memConsumed()
-	fmt.Printf("%.3fkb\n", float64(after-before)/numGoroutines/1000)
+	fmt.Println("All goroutine complete.")
 }
 
 func getLuckyNum(c chan<- int) {
