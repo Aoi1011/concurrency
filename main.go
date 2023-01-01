@@ -9,16 +9,14 @@ import (
 
 func main() {
 	var wg sync.WaitGroup
-
-	sayHello := func() {
-		defer wg.Done()
-		fmt.Println("hello")
+	for _, salutation := range []string{"hello", "greetings", "good day"} {
+		wg.Add(1)
+		go func(salutation string) {
+			defer wg.Done()
+			fmt.Println(salutation)
+		}(salutation)
 	}
-
-	wg.Add(1)
-	go sayHello()
-
-	wg.Wait() // This is the join point
+	wg.Wait()
 }
 
 func getLuckyNum(c chan<- int) {
