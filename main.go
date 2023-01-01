@@ -1,47 +1,59 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"math/rand"
 	"sync"
-	"sync/atomic"
 	"time"
 )
 
 func main() {
-	cadence := sync.NewCond(&sync.Mutex{})
+	var wg sync.WaitGroup
+	var sharedLock sync.Mutex
+	const runtime = 1 * time.Second
 
-	go func() {
-		for range time.Tick(1 * time.Millisecond) {
-			cadence.Broadcast()
+	greedyWorker := func() {
+		defer wg.Done()
+
+		var count int
+		for begin := time.Now(); time.Since(begin) <= runtime; {
+			sharedLock.Lock()
+			time.Sleep(3 * time.Nanosecond)
+			sharedLock.Unlock()
+			count++
 		}
-	}()
 
-	takeStep := func() {
-		cadence.L.Lock()
-		cadence.Wait()
-		cadence.L.Unlock()
+		fmt.Printf("Greedy worker was able to execute %v work loops\n", count)
 	}
 
-	tryDir := func(dirName string, dir *int32, out *bytes.Buffer) bool {
-		fmt.Fprintf(out, " %v", dirName)
-		atomic.AddInt32(dir, 1)
-		takeStep()
-		if atomic.LoadInt32(dir) == 1 {
-			fmt.Fprintf(out, ". Success")
-			return true
+	politeWorker := func() {
+		defer wg.Done()
+
+		var count int
+		for begin := time.Now(); time.Since(begin) <= runtime; {
+			sharedLock.Lock()
+			time.Sleep(3 * time.Nanosecond)
+			sharedLock.Unlock()
+
+			sharedLock.Lock()
+			time.Sleep(3 * time.Nanosecond)
+			sharedLock.Unlock()
+
+			sharedLock.Lock()
+			time.Sleep(3 * time.Nanosecond)
+			sharedLock.Unlock()
+
+			count++
 		}
-		takeStep()
-		atomic.AddInt32(dir, -1)
-		return false
+
+		fmt.Printf("Polite worker was able to execute %v work loops\n", count)
 	}
 
-	var left, right int32
-	tryLeft := func(out *bytes.Buffer) bool { return tryDir("left", &left, out) }
-	tryRight := func(out *bytes.Buffer) bool { return tryDir("right", &right, out) }
+	wg.Add(2)
+	go greedyWorker()
+	go politeWorker()
 
-	fmt.Printf("Left: %t \nRight: %t \n", tryLeft(&bytes.Buffer{}), tryRight(&bytes.Buffer{}))
+	wg.Wait()
 }
 
 func getLuckyNum(c chan<- int) {
