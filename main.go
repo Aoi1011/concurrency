@@ -9,51 +9,16 @@ import (
 
 func main() {
 	var wg sync.WaitGroup
-	var sharedLock sync.Mutex
-	const runtime = 1 * time.Second
 
-	greedyWorker := func() {
+	sayHello := func() {
 		defer wg.Done()
-
-		var count int
-		for begin := time.Now(); time.Since(begin) <= runtime; {
-			sharedLock.Lock()
-			time.Sleep(3 * time.Nanosecond)
-			sharedLock.Unlock()
-			count++
-		}
-
-		fmt.Printf("Greedy worker was able to execute %v work loops\n", count)
+		fmt.Println("hello")
 	}
 
-	politeWorker := func() {
-		defer wg.Done()
+	wg.Add(1)
+	go sayHello()
 
-		var count int
-		for begin := time.Now(); time.Since(begin) <= runtime; {
-			sharedLock.Lock()
-			time.Sleep(3 * time.Nanosecond)
-			sharedLock.Unlock()
-
-			sharedLock.Lock()
-			time.Sleep(3 * time.Nanosecond)
-			sharedLock.Unlock()
-
-			sharedLock.Lock()
-			time.Sleep(3 * time.Nanosecond)
-			sharedLock.Unlock()
-
-			count++
-		}
-
-		fmt.Printf("Polite worker was able to execute %v work loops\n", count)
-	}
-
-	wg.Add(2)
-	go greedyWorker()
-	go politeWorker()
-
-	wg.Wait()
+	wg.Wait() // This is the join point
 }
 
 func getLuckyNum(c chan<- int) {
