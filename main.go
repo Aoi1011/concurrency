@@ -3,27 +3,27 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"sync"
 	"time"
 )
 
 func main() {
-	done := make(chan struct{})
+	var memoryAccess sync.Mutex
+	var data int
 
-	gen1 := generator(done, 1)
-	gen2 := generator(done, 2)
+	go func() {
+		memoryAccess.Lock()
+		data++
+		memoryAccess.Unlock()
+	}()
 
-	result := fanIn1(done, gen1, gen2)
-	for i := 0; i < 5; i++ {
-		<-result
+	memoryAccess.Lock()
+	if data == 0 {
+		fmt.Println("the values is 0.")
+	} else {
+		fmt.Printf("the value is %d.\n", data)
 	}
-	close(done)
-	fmt.Println("main close done")
-
-	for {
-		if _, ok := <-result; !ok {
-			break
-		}
-	}
+	memoryAccess.Unlock()
 }
 
 func getLuckyNum(c chan<- int) {
