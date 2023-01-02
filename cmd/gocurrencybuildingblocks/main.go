@@ -1,7 +1,10 @@
 package main
 
-import "github.com/Aoi1011/concurrency/cmd/gocurrencybuildingblocks/syncpackage/mutexrwmutex"
+import (
+	"github.com/Aoi1011/concurrency/cmd/gocurrencybuildingblocks/goroutines"
+)
 
 func main() {
-	mutexrwmutex.Mutex()
+	// mutexrwmutex.Mutex()
+	goroutines.JoinPoint()
 }
