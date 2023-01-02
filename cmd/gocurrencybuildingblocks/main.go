@@ -1,10 +1,9 @@
 package main
 
 import (
-	"github.com/Aoi1011/concurrency/cmd/gocurrencybuildingblocks/syncpackage/waitgroup"
+	"github.com/Aoi1011/concurrency/cmd/gocurrencybuildingblocks/syncpackage/cond"
 )
 
 func main() {
-	// mutexrwmutex.Mutex()
-	waitgroup.BulkAdd()
+	cond.CondBasedQueue()
 }
