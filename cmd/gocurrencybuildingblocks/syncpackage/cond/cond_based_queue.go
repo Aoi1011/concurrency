@@ -29,5 +29,4 @@ func CondBasedQueue() {
 		go removeFromQueue(1 * time.Second)
 		c.L.Unlock()
 	}
-
 }
