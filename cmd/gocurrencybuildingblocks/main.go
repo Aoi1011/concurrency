@@ -6,5 +6,5 @@ import (
 
 func main() {
 	// mutexrwmutex.Mutex()
-	waitgroup.WaitGroupFunction()
+	waitgroup.BulkAdd()
 }
