@@ -12,4 +12,5 @@ Package sync provides basic syncronization primitives such as mutual exclusion l
 
 
 ## References
+- [source code](https://github.com/kat-co/concurrency-in-go-src)
 - [golang concurrency](https://zenn.dev/hsaki/books/golang-concurrency)
