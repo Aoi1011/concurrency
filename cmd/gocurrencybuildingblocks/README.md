@@ -6,4 +6,4 @@
 
 3. Channels
 
-4. The select Statement
+4. [The select Statement](https://edu.anarcho-copy.org/Programming%20Languages/Go/Concurrency%20in%20Go.pdf)
