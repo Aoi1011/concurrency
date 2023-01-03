@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	cond.CondBasedQueue()
+	cond.CondBroadcast()
 }
