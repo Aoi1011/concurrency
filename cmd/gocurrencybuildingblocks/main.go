@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	once.OnceDoDeadlock()
+	once.Once()
 }
