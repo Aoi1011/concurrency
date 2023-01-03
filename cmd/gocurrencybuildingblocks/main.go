@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/Aoi1011/concurrency/cmd/gocurrencybuildingblocks/syncpackage/pool"
+	"github.com/Aoi1011/concurrency/cmd/gocurrencybuildingblocks/channels"
 )
 
 func main() {
-	pool.Pool()
+	channels.SimpleChan()
 }
