@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/Aoi1011/concurrency/cmd/gocurrencybuildingblocks/syncpackage/once"
+	"github.com/Aoi1011/concurrency/cmd/gocurrencybuildingblocks/syncpackage/pool"
 )
 
 func main() {
-	once.Once()
+	pool.Pool()
 }
