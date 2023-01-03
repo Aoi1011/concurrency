@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/Aoi1011/concurrency/cmd/gocurrencybuildingblocks/syncpackage/cond"
+	"github.com/Aoi1011/concurrency/cmd/gocurrencybuildingblocks/syncpackage/once"
 )
 
 func main() {
-	cond.CondBroadcast()
+	once.OnceDoDeadlock()
 }
