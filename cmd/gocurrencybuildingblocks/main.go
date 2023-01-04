@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	selects.SelectTimeout()
+	selects.SelctDefaults()
 }

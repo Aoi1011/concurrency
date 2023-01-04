@@ -11,3 +11,5 @@ A select block encompasses a series of case statements that guard a series of st
 Unlike switch blocks, case statements in a select block aren't tested sequentially, and execution won't automatically fall through
 if none of the criteria are met.
 A select is only used with channels. 
+
+5. The GOMAXPROCS Lever
