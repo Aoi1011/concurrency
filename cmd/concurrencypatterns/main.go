@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/Aoi1011/concurrency/cmd/concurrencypatterns/orchannel"
+	"github.com/Aoi1011/concurrency/cmd/concurrencypatterns/errorhandling"
 )
 
 func main() {
-	orchannel.OrChannel()
+	errorhandling.StopAfterThreeErrors()
 }
