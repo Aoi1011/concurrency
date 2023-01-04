@@ -1,7 +1,9 @@
 package main
 
-import "github.com/Aoi1011/concurrency/cmd/concurrencypatterns/confinement"
+import (
+	"github.com/Aoi1011/concurrency/cmd/concurrencypatterns/preventinggoroutineleaks"
+)
 
 func main() {
-	confinement.Structs()
+	preventinggoroutineleaks.LeakFromBlockedChannelWriteSolved()
 }
