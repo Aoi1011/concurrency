@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/Aoi1011/concurrency/cmd/gocurrencybuildingblocks/channels"
+	"github.com/Aoi1011/concurrency/cmd/gocurrencybuildingblocks/selects"
 )
 
 func main() {
-	channels.ChanOwnership()
+	selects.SelectTimeout()
 }
