@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/Aoi1011/concurrency/cmd/concurrencypatterns/preventinggoroutineleaks"
+	"github.com/Aoi1011/concurrency/cmd/concurrencypatterns/orchannel"
 )
 
 func main() {
-	preventinggoroutineleaks.LeakFromBlockedChannelWriteSolved()
+	orchannel.OrChannel()
 }
