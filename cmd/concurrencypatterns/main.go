@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/Aoi1011/concurrency/cmd/concurrencypatterns/errorhandling"
+	"github.com/Aoi1011/concurrency/cmd/concurrencypatterns/pipelines"
 )
 
 func main() {
-	errorhandling.StopAfterThreeErrors()
+	pipelines.ChanStreamProcessing()
 }
