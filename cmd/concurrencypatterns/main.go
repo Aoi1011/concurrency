@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	pipelines.ChanStreamProcessing()
+	pipelines.TakeAndRepeatPipeline()
 }
