@@ -30,7 +30,6 @@ func ChanStreamProcessing() {
 				}
 			}
 		}()
-
 		return multipliedStream
 	}
 
@@ -42,11 +41,10 @@ func ChanStreamProcessing() {
 				select {
 				case <-done:
 					return
-				case addedStream <- i + <-addedStream:
+				case addedStream <- i + additive:
 				}
 			}
 		}()
-
 		return addedStream
 	}
 
