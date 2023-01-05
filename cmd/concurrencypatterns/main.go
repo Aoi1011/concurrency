@@ -5,5 +5,5 @@ import (
 )
 
 func main() {
-	pipelines.TakeAndRepeatRandomValue()
+	pipelines.UtilizingStringStage()
 }

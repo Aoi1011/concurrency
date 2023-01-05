@@ -30,3 +30,13 @@ for _, s := range []string {"a", "b", "c"} {
 ```
 
 ## Preventing Goroutine Leaks
+
+
+## The or-channel
+
+## Error Handling
+
+## Pipelines
+
+## Fan-Out, Fan-In
+Sometimes, stages in your pipeline can be particularly computationally expensive. 
